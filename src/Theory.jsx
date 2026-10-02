@@ -5,382 +5,464 @@ import * as THREE from 'three';
 
 // ==========================================================
 // 1. COMPLETE STRUCTURED PHYSICS DATA
-// Contains all Chapters and every specified formula, including
-// the advanced GR machinery, Kerr ray tracing, and cosmology.
+// Contains all 20 Chapters with complete mathematical frameworks
 // ==========================================================
 const THEORY_DATA = [
   {
     id: 'classical',
-    title: 'Classical Mechanics & Fluids',
+    title: '1. Classical Mechanics & Gravitation',
     sections: [
       {
-        title: 'Newtonian Gravity & Orbital Dynamics',
+        title: 'Newtonian Dynamics',
         items: [
-          { type: 'text', content: 'Newtonian gravity, potential, and gravitational acceleration:' },
-          { type: 'formula', name: 'Newtonian Force', tex: 'F=\\frac{GMm}{r^2}', tag: 'Fundamental Force', appliesTo: 'Weak field, low velocity', assumptions: 'Point masses or spherical symmetry' },
-          { type: 'formula', name: 'Gravitational Potential', tex: '\\Phi=-\\frac{GM}{r}', tag: 'Potential field', appliesTo: 'Weak field gravity', assumptions: 'Infinity as zero reference' },
-          { type: 'formula', name: 'Gravitational Acceleration', tex: '\\mathbf g=-\\nabla\\Phi', tag: 'Vector field', appliesTo: 'Classical gravity', assumptions: 'Conservative field' },
-          { type: 'text', content: 'Orbital kinematics and velocity:' },
-          { type: 'formula', name: 'Circular Orbital Velocity', tex: 'v_\\mathrm{orb}=\\sqrt{\\frac{GM}{r}}', tag: 'Kinematics', appliesTo: 'Circular orbits', assumptions: 'Keplerian mechanics' },
-          { type: 'formula', name: 'Angular Velocity', tex: '\\Omega=\\frac{v}{r} \\quad,\\quad \\omega=2\\pi f \\quad,\\quad v_\\mathrm{rot}=\\Omega R', tag: 'Kinematics', appliesTo: 'Rotating bodies', assumptions: 'Rigid body or circular path' },
-          { type: 'formula', name: 'Escape Velocity', tex: 'v_\\mathrm{esc} = \\sqrt{\\frac{2GM}{R}}', tag: 'Kinematics', appliesTo: 'Ballistic trajectories', assumptions: 'Newtonian approximation' },
-          { type: 'text', content: 'Virial theorem for self-gravitating systems:' },
-          { type: 'formula', name: 'Virial Theorem', tex: '2K+U=0 \\quad,\\quad 2T+W+3\\int P\\,dV=0', tag: 'Equilibrium Condition', appliesTo: 'Stars, clusters, galaxies', assumptions: 'System in virial equilibrium' },
+          { type: 'formula', name: 'Newton\'s Second Law', tex: '\\mathbf F=m\\mathbf a', tag: 'Dynamics', appliesTo: 'Classical mechanics', assumptions: 'Constant mass, non-relativistic' },
+          { type: 'formula', name: 'Linear Momentum', tex: '\\mathbf p=m\\mathbf v \\quad,\\quad \\mathbf F=\\frac{d\\mathbf p}{dt}', tag: 'Conservation', appliesTo: 'Particle dynamics', assumptions: 'None' },
+          { type: 'formula', name: 'Angular Momentum & Torque', tex: '\\mathbf L=\\mathbf r\\times\\mathbf p \\quad,\\quad \\boldsymbol\\tau=\\frac{d\\mathbf L}{dt}', tag: 'Conservation', appliesTo: 'Rotational dynamics', assumptions: 'Central forces' },
+          { type: 'formula', name: 'Rotational Kinetic Energy', tex: 'K_\\mathrm{rot}=\\frac12I\\omega^2', tag: 'Energy', appliesTo: 'Rigid bodies', assumptions: 'Fixed axis of rotation' }
         ]
       },
       {
-        title: 'Fluid Dynamics & Conservation',
+        title: 'Gravitation & Orbits',
         items: [
-          { type: 'formula', name: 'Continuity Equation', tex: '\\frac{\\partial\\rho}{\\partial t} +\\nabla\\cdot(\\rho\\mathbf v)=0', tag: 'Conservation Law', appliesTo: 'Fluids, Plasmas', assumptions: 'No mass creation/destruction' },
-          { type: 'formula', name: 'Euler Equation', tex: '\\rho \\left( \\frac{\\partial\\mathbf v}{\\partial t} + \\mathbf v\\cdot\\nabla\\mathbf v \\right) = -\\nabla P+\\rho\\mathbf g', tag: 'Momentum Conservation', appliesTo: 'Inviscid fluids', assumptions: 'Zero viscosity' },
-          { type: 'formula', name: 'Navier-Stokes Equation', tex: '\\rho \\left( \\frac{\\partial\\mathbf v}{\\partial t} + \\mathbf v\\cdot\\nabla\\mathbf v \\right) = -\\nabla P +\\mu\\nabla^2\\mathbf v +\\rho\\mathbf g', tag: 'Momentum Conservation', appliesTo: 'Viscous fluids', assumptions: 'Newtonian fluid' },
-          { type: 'formula', name: 'Energy Conservation', tex: '\\frac{\\partial E}{\\partial t} + \\nabla\\cdot[(E+P)\\mathbf v] = \\text{sources}-\\text{sinks}', tag: 'Conservation Law', appliesTo: 'Thermodynamic fluid flows', assumptions: 'Includes internal energy and work' },
-          { type: 'formula', name: 'Sound Speed & Mach Number', tex: 'c_s^2= \\left(\\frac{\\partial P}{\\partial\\rho}\\right)_s \\quad,\\quad \\mathcal M=\\frac{v}{c_s}', tag: 'Acoustics', appliesTo: 'Compressible flows', assumptions: 'Adiabatic compression' }
+          { type: 'formula', name: 'Gravitational Potential Energy', tex: 'U=-\\frac{GMm}{r}', tag: 'Energy', appliesTo: 'Two-body systems', assumptions: 'Spherical symmetry or point masses' },
+          { type: 'formula', name: 'Total Orbital Energy', tex: 'E=\\frac12mv^2-\\frac{GMm}{r}', tag: 'Energy', appliesTo: 'Keplerian orbits', assumptions: 'Isolated two-body system' },
+          { type: 'formula', name: 'Vis-Viva Equation', tex: 'v^2=GM\\left(\\frac2r-\\frac1a\\right)', tag: 'Kinematics', appliesTo: 'Elliptical orbits', assumptions: 'Keplerian motion' },
+          { type: 'formula', name: 'Kepler\'s Third Law', tex: 'T^2=\\frac{4\\pi^2}{GM}a^3', tag: 'Kinematics', appliesTo: 'Orbital periods', assumptions: 'M >> m' },
+          { type: 'formula', name: 'Reduced Mass', tex: '\\mu=\\frac{m_1m_2}{m_1+m_2}', tag: 'Two-body reduction', appliesTo: 'Binary systems', assumptions: 'Center of mass frame' }
+        ]
+      },
+      {
+        title: 'Advanced Mechanics',
+        items: [
+          { type: 'formula', name: 'Lagrangian', tex: 'L=T-U', tag: 'Analytical Mechanics', appliesTo: 'System evolution', assumptions: 'Conservative forces' },
+          { type: 'formula', name: 'Euler-Lagrange Equation', tex: '\\frac{d}{dt} \\frac{\\partial L}{\\partial\\dot q_i} - \\frac{\\partial L}{\\partial q_i}=0', tag: 'Equation of Motion', appliesTo: 'Generalized coordinates', assumptions: 'Holonomic constraints' },
+          { type: 'formula', name: 'Hamiltonian', tex: 'H=\\sum_i p_i\\dot q_i-L', tag: 'Analytical Mechanics', appliesTo: 'Phase space dynamics', assumptions: 'Legendre transformation of L' },
+          { type: 'formula', name: 'Hamilton\'s Equations', tex: '\\dot q_i=\\frac{\\partial H}{\\partial p_i} \\quad,\\quad \\dot p_i=-\\frac{\\partial H}{\\partial q_i}', tag: 'Equations of Motion', appliesTo: 'Symplectic geometry', assumptions: 'Classical phase space' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'fluids_mhd',
+    title: '2. Fluid Dynamics & Magnetohydrodynamics',
+    sections: [
+      {
+        title: 'Fluid Equations',
+        items: [
+          { type: 'formula', name: 'Material Derivative', tex: '\\frac{D}{Dt} = \\frac{\\partial}{\\partial t} +\\mathbf v\\cdot\\nabla', tag: 'Operator', appliesTo: 'Lagrangian frame tracking', assumptions: 'Continuum hypothesis' },
+          { type: 'formula', name: 'Continuity Equation', tex: '\\frac{\\partial\\rho}{\\partial t} +\\nabla\\cdot(\\rho\\mathbf v)=0', tag: 'Conservation', appliesTo: 'Mass transport', assumptions: 'No sources or sinks' },
+          { type: 'formula', name: 'Euler Equation', tex: '\\rho \\left( \\frac{\\partial\\mathbf v}{\\partial t} + \\mathbf v\\cdot\\nabla\\mathbf v \\right) = -\\nabla P+\\rho\\mathbf g', tag: 'Momentum', appliesTo: 'Inviscid flows', assumptions: 'Zero viscosity' },
+          { type: 'formula', name: 'Navier-Stokes Equation', tex: '\\rho\\frac{D\\mathbf v}{Dt} = -\\nabla P+\\mu\\nabla^2\\mathbf v+\\rho\\mathbf g', tag: 'Momentum', appliesTo: 'Viscous flows', assumptions: 'Newtonian fluid' },
+          { type: 'formula', name: 'Vorticity', tex: '\\boldsymbol\\omega=\\nabla\\times\\mathbf v', tag: 'Kinematics', appliesTo: 'Rotational flows', assumptions: 'Continuum field' },
+          { type: 'formula', name: 'Bernoulli\'s Principle', tex: '\\frac12v^2+\\frac{P}{\\rho}+\\Phi=\\text{constant}', tag: 'Energy', appliesTo: 'Streamlines', assumptions: 'Steady, incompressible, inviscid' },
+          { type: 'formula', name: 'Reynolds Number', tex: 'Re=\\frac{\\rho vL}{\\mu}', tag: 'Dimensionless', appliesTo: 'Flow regime indicator', assumptions: 'Navier-Stokes scaling' },
+          { type: 'formula', name: 'Mach Number', tex: 'M=\\frac vc_s', tag: 'Dimensionless', appliesTo: 'Compressibility', assumptions: 'Adiabatic sound speed' }
+        ]
+      },
+      {
+        title: 'Magnetohydrodynamics (MHD)',
+        items: [
+          { type: 'formula', name: 'Induction Equation', tex: '\\frac{\\partial\\mathbf B}{\\partial t} = \\nabla\\times(\\mathbf v\\times\\mathbf B) -\\nabla\\times(\\eta\\nabla\\times\\mathbf B)', tag: 'MHD', appliesTo: 'Conducting fluids', assumptions: 'Ohm\'s law applies' },
+          { type: 'formula', name: 'Lorentz Force Density', tex: '\\mathbf f=\\mathbf J\\times\\mathbf B', tag: 'Dynamics', appliesTo: 'Plasma back-reaction', assumptions: 'Non-relativistic bulk motion' },
+          { type: 'formula', name: 'Magnetic Pressure', tex: 'P_B=\\frac{B^2}{2\\mu_0}', tag: 'Thermodynamics', appliesTo: 'Plasma confinement', assumptions: 'Isotropic effective pressure' }
         ]
       }
     ]
   },
   {
     id: 'electromagnetism',
-    title: 'Electromagnetism & Radiation',
+    title: '3. Electromagnetism',
     sections: [
       {
-        title: 'Maxwell\'s Equations & Covariant EM',
+        title: 'Potentials & Fields',
         items: [
-          { type: 'formula', name: 'Gauss\'s Laws', tex: '\\nabla\\cdot\\mathbf E = \\frac{\\rho_e}{\\epsilon_0} \\quad,\\quad \\nabla\\cdot\\mathbf B=0', tag: 'Field Equation', appliesTo: 'Electric/Magnetic fields', assumptions: 'No magnetic monopoles' },
-          { type: 'formula', name: 'Faraday & Ampère-Maxwell', tex: '\\nabla\\times\\mathbf E = -\\frac{\\partial\\mathbf B}{\\partial t} \\quad,\\quad \\nabla\\times\\mathbf B = \\mu_0\\mathbf J + \\mu_0\\epsilon_0 \\frac{\\partial\\mathbf E}{\\partial t}', tag: 'Field Equation', appliesTo: 'Electrodynamics', assumptions: 'Classical vacuum' },
-          { type: 'formula', name: 'Lorentz Force', tex: '\\mathbf F=q(\\mathbf E+\\mathbf v\\times\\mathbf B)', tag: 'Force', appliesTo: 'Charged particles', assumptions: 'Classical electrodynamics' },
-          { type: 'text', content: 'Covariant formulation for relativistic integration:' },
-          { type: 'formula', name: 'Covariant EM Equations', tex: '\\nabla_\\mu F^{\\mu\\nu} = \\mu_0J^\\nu \\quad,\\quad \\nabla_{[\\lambda}F_{\\mu\\nu]}=0', tag: 'Tensor Equation', appliesTo: 'Relativistic electrodynamics', assumptions: 'Curved or flat spacetime' },
-          { type: 'formula', name: 'Electromagnetic Field Tensor', tex: 'F_{\\mu\\nu} = \\partial_\\mu A_\\nu-\\partial_\\nu A_\\mu', tag: 'Definition', appliesTo: 'Gauge theory', assumptions: 'Defined from 4-potential' },
-          { type: 'formula', name: 'EM Stress-Energy Tensor', tex: 'T_{\\mu\\nu}^{EM} = \\frac{1}{\\mu_0} \\left( F_{\\mu\\alpha}F_\\nu{}^\\alpha -\\frac14g_{\\mu\\nu}F_{\\alpha\\beta}F^{\\alpha\\beta} \\right)', tag: 'Energy-Momentum', appliesTo: 'Coupling EM to GR', assumptions: 'Classical EM field' },
-          { type: 'formula', name: 'EM Waves in Vacuum', tex: '\\nabla^2\\mathbf E - \\frac1{c^2} \\frac{\\partial^2\\mathbf E}{\\partial t^2} =0 \\quad,\\quad c=\\frac1{\\sqrt{\\mu_0\\epsilon_0}}', tag: 'Wave Equation', appliesTo: 'Light/Radiation', assumptions: 'Source-free vacuum' }
+          { type: 'formula', name: 'Vector & Scalar Potentials', tex: '\\mathbf B=\\nabla\\times\\mathbf A \\quad,\\quad \\mathbf E=-\\nabla\\phi-\\frac{\\partial\\mathbf A}{\\partial t}', tag: 'Definitions', appliesTo: 'Gauge theory', assumptions: 'Classical electrodynamics' },
+          { type: 'formula', name: 'Poynting Vector', tex: '\\mathbf S=\\frac1{\\mu_0}\\mathbf E\\times\\mathbf B', tag: 'Energy Transport', appliesTo: 'EM Waves', assumptions: 'Vacuum or linear media' },
+          { type: 'formula', name: 'EM Energy Density', tex: 'u= \\frac12 \\left( \\epsilon_0E^2+\\frac{B^2}{\\mu_0} \\right)', tag: 'Energy', appliesTo: 'EM Fields', assumptions: 'Classical vacuum' }
         ]
       },
       {
-        title: 'Magnetohydrodynamics (MHD)',
+        title: 'Covariant Formulation',
         items: [
-          { type: 'formula', name: 'Induction Equation', tex: '\\frac{\\partial\\mathbf B}{\\partial t} = \\nabla\\times(\\mathbf v\\times\\mathbf B) -\\nabla\\times(\\eta\\nabla\\times\\mathbf B)', tag: 'Plasma Physics', appliesTo: 'Conducting fluids, stars', assumptions: 'Ohmic dissipation included' },
-          { type: 'formula', name: 'Magnetic Lorentz Force', tex: '\\mathbf f_L = \\mathbf J\\times\\mathbf B \\quad,\\quad \\mathbf J= \\frac{1}{\\mu_0}\\nabla\\times\\mathbf B', tag: 'Force density', appliesTo: 'Plasma bulk forces', assumptions: 'SI units' }
+          { type: 'formula', name: 'Electromagnetic Field Tensor', tex: 'F_{\\mu\\nu} = \\partial_\\mu A_\\nu-\\partial_\\nu A_\\mu', tag: 'Tensor', appliesTo: 'Relativistic EM', assumptions: '4-potential A_mu' },
+          { type: 'formula', name: 'Covariant Maxwell Equations', tex: '\\nabla_\\mu F^{\\mu\\nu}=\\mu_0J^\\nu', tag: 'Field Equation', appliesTo: 'Sources and fields', assumptions: 'Curved or flat spacetime' },
+          { type: 'formula', name: 'EM Stress-Energy Tensor', tex: 'T_{\\mu\\nu}^{EM} = \\frac1{\\mu_0} \\left( F_{\\mu\\alpha}F_\\nu{}^\\alpha -\\frac14g_{\\mu\\nu}F_{\\alpha\\beta}F^{\\alpha\\beta} \\right)', tag: 'Energy-Momentum', appliesTo: 'Coupling to GR', assumptions: 'Symmetric, traceless' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'radiation',
+    title: '4. Radiation & Radiative Transfer',
+    sections: [
+      {
+        title: 'Thermal Radiation',
+        items: [
+          { type: 'formula', name: 'Planck Function', tex: 'B_\\nu(T)= \\frac{2h\\nu^3}{c^2} \\frac1{e^{h\\nu/k_BT}-1}', tag: 'Spectrum', appliesTo: 'Blackbodies', assumptions: 'Thermal equilibrium' },
+          { type: 'formula', name: 'Stefan-Boltzmann Law', tex: 'F=\\sigma T^4', tag: 'Flux', appliesTo: 'Total emitted power', assumptions: 'Integrated over all frequencies' },
+          { type: 'formula', name: 'Wien\'s Displacement Law', tex: '\\lambda_{\\max}T=b', tag: 'Spectrum Peak', appliesTo: 'Color temperature', assumptions: 'b ≈ 2.898×10⁻³ m·K' },
+          { type: 'formula', name: 'Radiation Energy Density', tex: 'u=aT^4', tag: 'Thermodynamics', appliesTo: 'Photon gas', assumptions: 'Isotropic field' },
+          { type: 'formula', name: 'Radiation Pressure', tex: 'P=\\frac13aT^4', tag: 'Thermodynamics', appliesTo: 'Stellar interiors', assumptions: 'Isotropic field' }
         ]
       },
       {
         title: 'Radiative Transfer',
         items: [
-          { type: 'text', content: 'The fundamental equations governing radiation propagating through matter.' },
-          { type: 'formula', name: 'Radiative Transfer Equation', tex: '\\frac{dI_\\nu}{ds} = -\\alpha_\\nu I_\\nu+j_\\nu \\quad \\text{or} \\quad \\frac{dI_\\nu}{d\\tau_\\nu} = -I_\\nu+S_\\nu', tag: 'Transport Equation', appliesTo: 'Stellar atmospheres, accretion', assumptions: 'Source function S_v = j_v/a_v' },
-          { type: 'formula', name: 'Optical Depth', tex: '\\tau_\\nu = \\int \\alpha_\\nu\\,ds', tag: 'Property', appliesTo: 'Medium opacity', assumptions: 'Integrated absorption' },
-          { type: 'formula', name: 'Pure Absorption', tex: 'I_\\nu(s) = I_{\\nu,0}e^{-\\tau_\\nu}', tag: 'Solution', appliesTo: 'Non-emitting medium', assumptions: 'Zero emission' },
-          { type: 'formula', name: 'Formal Solution (Transfer)', tex: 'I_\\nu(s) = I_\\nu(0)e^{-\\tau_\\nu} + \\int_0^s j_\\nu(s\') e^{-[\\tau_\\nu(s)-\\tau_\\nu(s\')]} ds\'', tag: 'Solution', appliesTo: 'Optical depth tracking', assumptions: 'General medium' }
-        ]
-      },
-      {
-        title: 'Thermal Radiation',
-        items: [
-          { type: 'formula', name: 'Stefan-Boltzmann Law', tex: 'F=\\sigma T^4 \\quad,\\quad L=4\\pi R^2\\sigma T^4', tag: 'Thermal Emission', appliesTo: 'Blackbodies, Stars', assumptions: 'Perfect thermal emitter' },
-          { type: 'formula', name: 'Wien\'s Displacement Law', tex: '\\lambda_\\mathrm{max} = \\frac{b}{T}', tag: 'Thermal Emission', appliesTo: 'Blackbody peaks', assumptions: 'b ≈ 2.898×10⁻³ m·K' },
-          { type: 'formula', name: 'Radiation Pressure & Density', tex: 'P_\\mathrm{rad} = \\frac{aT^4}{3} \\quad,\\quad u=aT^4 \\quad,\\quad a=\\frac{4\\sigma}{c}', tag: 'Thermodynamics', appliesTo: 'Photon gas, stellar cores', assumptions: 'Isotropic radiation field' }
+          { type: 'formula', name: 'Radiative Transfer Equation', tex: '\\frac{dI_\\nu}{ds} = -\\alpha_\\nu I_\\nu+j_\\nu', tag: 'Transport', appliesTo: 'Media propagation', assumptions: 'Macroscopic ray tracing' },
+          { type: 'formula', name: 'Optical Depth', tex: '\\tau_\\nu=\\int\\alpha_\\nu ds', tag: 'Property', appliesTo: 'Opacity tracking', assumptions: 'Integrated along line of sight' },
+          { type: 'formula', name: 'Source Function', tex: 'S_\\nu=\\frac{j_\\nu}{\\alpha_\\nu}', tag: 'Definition', appliesTo: 'Emission vs absorption', assumptions: 'Local thermodynamic equilibrium' },
+          { type: 'formula', name: 'Formal Solution', tex: 'I_\\nu(s) = I_\\nu(0)e^{-\\tau_\\nu} + \\int_0^s j_\\nu(s\') e^{-[\\tau_\\nu(s)-\\tau_\\nu(s\')]} ds\'', tag: 'Solution', appliesTo: 'Renderer implementation', assumptions: 'Non-scattering medium' }
         ]
       }
     ]
   },
   {
     id: 'thermo',
-    title: 'Thermodynamics & Stat Mech',
+    title: '5. Thermodynamics & Statistical Mechanics',
     sections: [
       {
-        title: 'Core Thermodynamics',
+        title: 'Laws & Potentials',
         items: [
-          { type: 'formula', name: 'Laws of Thermodynamics', tex: 'dU=\\delta Q-\\delta W \\quad,\\quad dS=\\frac{\\delta Q_\\mathrm{rev}}{T} \\quad,\\quad \\Delta S_\\mathrm{total}\\geq0', tag: 'Fundamental Laws', appliesTo: 'All macroscopic systems', assumptions: 'Classical isolated system' },
-          { type: 'formula', name: 'Boltzmann Entropy', tex: 'S=k_B\\ln\\Omega', tag: 'Statistical Definition', appliesTo: 'Microstates', assumptions: 'Equiprobable microstates' }
+          { type: 'formula', name: 'First Law of Thermodynamics', tex: 'dU=TdS-PdV+\\mu dN', tag: 'Conservation', appliesTo: 'Energy change', assumptions: 'Reversible processes' },
+          { type: 'formula', name: 'Second Law of Thermodynamics', tex: 'dS\\geq\\frac{\\delta Q}{T}', tag: 'Entropy', appliesTo: 'Irreversibility', assumptions: 'Isolated or closed systems' },
+          { type: 'formula', name: 'Helmholtz Free Energy', tex: 'F=U-TS', tag: 'Potential', appliesTo: 'Constant T, V systems', assumptions: 'Extractable work' },
+          { type: 'formula', name: 'Gibbs Free Energy', tex: 'G=U+PV-TS', tag: 'Potential', appliesTo: 'Constant T, P systems', assumptions: 'Phase transitions' },
+          { type: 'formula', name: 'Enthalpy', tex: 'H=U+PV', tag: 'Potential', appliesTo: 'Constant P heating', assumptions: 'Includes flow work' },
+          { type: 'formula', name: 'Chemical Potential', tex: '\\mu= \\left( \\frac{\\partial U}{\\partial N} \\right)_{S,V}', tag: 'Property', appliesTo: 'Particle exchange', assumptions: 'Equilibrium' }
         ]
       },
       {
-        title: 'Complete Equation of State',
+        title: 'Statistical Distributions',
         items: [
-          { type: 'formula', name: 'Total Stellar EOS', tex: 'P=P_\\mathrm{gas}+P_\\mathrm{rad}+P_\\mathrm{deg}+\\cdots', tag: 'EOS', appliesTo: 'Stellar interiors', assumptions: 'Local thermodynamic equilibrium' },
-          { type: 'formula', name: 'Ideal Gas', tex: 'P_\\mathrm{gas} = \\frac{\\rho k_BT}{\\mu m_u}', tag: 'EOS', appliesTo: 'Main sequence stars', assumptions: 'Non-interacting particles' },
-          { type: 'formula', name: 'Non-Relativistic Degeneracy', tex: 'P_\\mathrm{NR} = \\frac{\\hbar^2}{5m_e} (3\\pi^2)^{2/3} n_e^{5/3} \\implies P\\propto\\rho^{5/3}', tag: 'EOS', appliesTo: 'Low-mass White Dwarfs', assumptions: 'Complete electron degeneracy' },
-          { type: 'formula', name: 'Ultra-Relativistic Degeneracy', tex: 'P_\\mathrm{rel} = \\frac{\\hbar c}{4} (3\\pi^2)^{1/3} n_e^{4/3} \\implies P\\propto\\rho^{4/3}', tag: 'EOS', appliesTo: 'Chandrasekhar limit approach', assumptions: 'Electrons moving near c' },
-          { type: 'formula', name: 'Fermi Momentum', tex: 'p_F = \\hbar(3\\pi^2n_e)^{1/3}', tag: 'Fermi Properties', appliesTo: 'Degenerate matter', assumptions: 'Zero temperature limit' },
-          { type: 'formula', name: 'Relativistic Fermi Energy', tex: 'E_F = \\sqrt{p_F^2c^2+m_e^2c^4}', tag: 'Fermi Properties', appliesTo: 'Dense objects', assumptions: 'Relativistic kinematics' }
+          { type: 'formula', name: 'Fermi-Dirac Distribution', tex: 'f(E)= \\frac1{e^{(E-\\mu)/k_BT}+1}', tag: 'Quantum Stats', appliesTo: 'Fermions (e-, n, p)', assumptions: 'Pauli exclusion' },
+          { type: 'formula', name: 'Bose-Einstein Distribution', tex: 'f(E)= \\frac1{e^{(E-\\mu)/k_BT}-1}', tag: 'Quantum Stats', appliesTo: 'Bosons (photons)', assumptions: 'Indistinguishable, no exclusion' },
+          { type: 'formula', name: 'Fermi Momentum', tex: 'p_F=\\hbar(3\\pi^2n)^{1/3}', tag: 'Degeneracy', appliesTo: 'Dense matter', assumptions: 'Zero temperature limit' },
+          { type: 'formula', name: 'Relativistic Energy Relation', tex: 'E=\\sqrt{p^2c^2+m^2c^4}', tag: 'Kinematics', appliesTo: 'High-energy particles', assumptions: 'Special relativity applies' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'qm',
+    title: '6. Quantum Mechanics & Quantum Statistics',
+    sections: [
+      {
+        title: 'Core Formalism',
+        items: [
+          { type: 'formula', name: 'Commutation Relation', tex: '[\\hat x,\\hat p]=i\\hbar', tag: 'Operators', appliesTo: 'Conjugate variables', assumptions: 'Canonical quantization' },
+          { type: 'formula', name: 'Time-Independent Schrödinger Eq', tex: '\\hat H\\psi=E\\psi', tag: 'Wave Equation', appliesTo: 'Stationary states', assumptions: 'Non-relativistic' },
+          { type: 'formula', name: 'Expectation Value', tex: '\\langle A\\rangle = \\int\\psi^*\\hat A\\psi\\,d^3x', tag: 'Measurement', appliesTo: 'Observables', assumptions: 'Normalized wavefunction' },
+          { type: 'formula', name: 'Heisenberg Equation of Motion', tex: '\\frac{d\\hat A}{dt} = \\frac{i}{\\hbar}[\\hat H,\\hat A] + \\frac{\\partial\\hat A}{\\partial t}', tag: 'Evolution', appliesTo: 'Operators in Heisenberg picture', assumptions: 'Unitary evolution' }
         ]
       },
       {
-        title: 'Statistical Mechanics',
+        title: 'Fermion Physics',
         items: [
-          { type: 'formula', name: 'Boltzmann Distribution & Partition', tex: 'P_i\\propto e^{-E_i/(k_BT)} \\quad,\\quad Z=\\sum_i e^{-E_i/(k_BT)}', tag: 'Probability Distribution', appliesTo: 'Classical thermal systems', assumptions: 'Canonical ensemble' },
-          { type: 'formula', name: 'Quantum Distributions', tex: 'f(E)_\\mathrm{FD}= \\frac1{e^{(E-\\mu)/(k_BT)}+1} \\quad,\\quad f(E)_\\mathrm{BE}= \\frac1{e^{(E-\\mu)/(k_BT)}-1}', tag: 'Quantum Statistics', appliesTo: 'Fermions & Bosons', assumptions: 'Indistinguishable particles' }
+          { type: 'text', content: 'Pauli Exclusion Principle dictates that fermionic wavefunctions must be fully antisymmetric under particle exchange.' },
+          { type: 'formula', name: 'Fermi Energy', tex: 'E_F= \\sqrt{p_F^2c^2+m^2c^4}', tag: 'Energy Threshold', appliesTo: 'Degenerate gas', assumptions: 'Highest occupied state at T=0' }
         ]
       }
     ]
   },
   {
     id: 'sr',
-    title: 'Special Relativity',
+    title: '7. Special Relativity',
     sections: [
       {
-        title: 'Spacetime Geometry',
+        title: 'Four-Vectors & Kinematics',
         items: [
-          { type: 'formula', name: 'Minkowski Metric', tex: 'ds^2=-c^2dt^2+dx^2+dy^2+dz^2 = \\eta_{\\mu\\nu}dx^\\mu dx^\\nu', tag: 'Line Element', appliesTo: 'Flat spacetime', assumptions: 'No gravity' },
-          { type: 'formula', name: 'Minkowski Tensor', tex: '\\eta_{\\mu\\nu}= \\mathrm{diag}(-1, 1, 1, 1)', tag: 'Metric Tensor', appliesTo: 'SR convention (-+++)', assumptions: 'Cartesian coordinates' },
-          { type: 'formula', name: 'Lorentz Factor & Proper Time', tex: '\\gamma=\\frac{1}{\\sqrt{1-v^2/c^2}} \\quad,\\quad d\\tau^2=-\\frac{ds^2}{c^2} \\implies \\Delta t=\\gamma\\Delta\\tau', tag: 'Kinematics', appliesTo: 'Moving observers', assumptions: 'Constant inertial velocity' },
-          { type: 'formula', name: 'Lorentz Transformation', tex: 'x\'=\\gamma(x-vt) \\quad,\\quad t\'=\\gamma \\left(t-\\frac{vx}{c^2}\\right)', tag: 'Coordinate Transform', appliesTo: 'Boost in x-direction', assumptions: 'Standard configuration' },
-          { type: 'formula', name: 'Velocity Addition', tex: 'u\'_x= \\frac{u_x-v} {1-\\frac{u_xv}{c^2}} \\quad,\\quad u\'_y= \\frac{u_y} {\\gamma(1-u_xv/c^2)}', tag: 'Kinematics', appliesTo: 'Compound velocities', assumptions: 'Prevents v > c' }
+          { type: 'formula', name: 'Four-Velocity', tex: 'u^\\mu=\\frac{dx^\\mu}{d\\tau}', tag: 'Kinematics', appliesTo: 'Spacetime trajectories', assumptions: 'Massive particles' },
+          { type: 'formula', name: 'Four-Momentum', tex: 'p^\\mu=mu^\\mu', tag: 'Dynamics', appliesTo: 'Energy-momentum tracking', assumptions: 'Invariant mass m' },
+          { type: 'formula', name: 'Four-Acceleration', tex: 'a^\\mu=\\frac{du^\\mu}{d\\tau}', tag: 'Dynamics', appliesTo: 'Proper acceleration', assumptions: 'Orthogonal to 4-velocity' },
+          { type: 'formula', name: 'Four-Current', tex: 'J^\\mu=(c\\rho,\\mathbf J)', tag: 'Electrodynamics', appliesTo: 'Charge transport', assumptions: 'Charge conservation' },
+          { type: 'formula', name: 'Relativistic Doppler Effect', tex: '\\nu_\\mathrm{obs} = \\nu_\\mathrm{emit} \\sqrt{\\frac{1-\\beta}{1+\\beta}}', tag: 'Observable', appliesTo: 'Collinear motion', assumptions: 'Source moving away' }
         ]
       },
       {
-        title: 'Relativistic Energy & Momentum',
+        title: 'Energy & Invariants',
         items: [
-          { type: 'formula', name: 'Relativistic Momentum & Energy', tex: '\\mathbf p=\\gamma m\\mathbf v \\quad,\\quad E=\\gamma mc^2 \\quad,\\quad E_0=mc^2', tag: 'Dynamics', appliesTo: 'Massive particles', assumptions: 'Invariant mass m' },
-          { type: 'formula', name: 'Energy-Momentum Relation', tex: 'E^2=p^2c^2+m^2c^4', tag: 'Dispersion Relation', appliesTo: 'All particles', assumptions: 'None' },
-          { type: 'formula', name: 'Four-Vectors', tex: 'x^\\mu=(ct,x,y,z) \\quad,\\quad p^\\mu= \\left(\\frac Ec,\\mathbf{p}\\right) \\quad,\\quad u^\\mu=\\frac{dx^\\mu}{d\\tau}', tag: 'Tensor Math', appliesTo: 'Covariant mechanics', assumptions: 'p_\\mu p^\\mu = -m^2c^2' }
+          { type: 'formula', name: 'Relativistic Kinetic Energy', tex: 'K=(\\gamma-1)mc^2', tag: 'Energy', appliesTo: 'Particle collisions', assumptions: 'Rest mass subtracted' },
+          { type: 'formula', name: 'Energy-Momentum Invariant', tex: 'E^2-p^2c^2=m^2c^4', tag: 'Invariant', appliesTo: 'All inertial frames', assumptions: 'Minkowski metric' }
         ]
       }
     ]
   },
   {
     id: 'gr',
-    title: 'General Relativity Foundations',
+    title: '8. General Relativity',
     sections: [
       {
-        title: 'Differential Geometry',
+        title: 'Curvature & Field Equations',
         items: [
-          { type: 'formula', name: 'Covariant Derivative', tex: '\\nabla_\\mu V^\\nu = \\partial_\\mu V^\\nu+ \\Gamma^\\nu_{\\mu\\lambda}V^\\lambda', tag: 'Geometry', appliesTo: 'Vectors in curved space', assumptions: 'Preserves tensor rank' },
-          { type: 'formula', name: 'Tensor Covariant Derivative', tex: '\\nabla_\\lambda T^{\\mu\\nu} = \\partial_\\lambda T^{\\mu\\nu} + \\Gamma^\\mu_{\\lambda\\alpha}T^{\\alpha\\nu} + \\Gamma^\\nu_{\\lambda\\alpha}T^{\\mu\\alpha}', tag: 'Geometry', appliesTo: 'Tensors', assumptions: 'Leibniz rule applies' },
-          { type: 'formula', name: 'Metric Compatibility', tex: '\\nabla_\\lambda g_{\\mu\\nu}=0', tag: 'Geometry', appliesTo: 'Spacetime connection', assumptions: 'Metric-compatible connection' },
-          { type: 'formula', name: 'Christoffel Symbols', tex: '\\Gamma^\\rho_{\\mu\\nu} = \\frac12g^{\\rho\\sigma} \\left( \\partial_\\mu g_{\\sigma\\nu} +\\partial_\\nu g_{\\sigma\\mu} -\\partial_\\sigma g_{\\mu\\nu} \\right)', tag: 'Connection', appliesTo: 'Metric connection', assumptions: 'Torsion-free' }
-        ]
-      },
-      {
-        title: 'Curvature Tensors & Field Equations',
-        items: [
-          { type: 'formula', name: 'Riemann Tensor', tex: 'R^\\rho_{\\ \\sigma\\mu\\nu} = \\partial_\\mu\\Gamma^\\rho_{\\nu\\sigma} -\\partial_\\nu\\Gamma^\\rho_{\\mu\\sigma} +\\Gamma^\\rho_{\\mu\\lambda}\\Gamma^\\lambda_{\\nu\\sigma} -\\Gamma^\\rho_{\\nu\\lambda}\\Gamma^\\lambda_{\\mu\\sigma}', tag: 'Curvature', appliesTo: 'Spacetime curvature', assumptions: 'Levi-Civita connection' },
-          { type: 'formula', name: 'Ricci Tensor & Scalar', tex: 'R_{\\mu\\nu} = R^\\rho_{\\ \\mu\\rho\\nu} \\quad,\\quad R=g^{\\mu\\nu}R_{\\mu\\nu}', tag: 'Curvature Traces', appliesTo: 'Volume change', assumptions: 'Contracted Riemann' },
-          { type: 'formula', name: 'Einstein Tensor & Bianchi Identity', tex: 'G_{\\mu\\nu} = R_{\\mu\\nu} -\\frac12Rg_{\\mu\\nu} \\quad,\\quad \\nabla_\\mu G^{\\mu\\nu}=0', tag: 'Geometric tensor', appliesTo: 'Spacetime curvature', assumptions: 'Leads to stress-energy conservation' },
-          { type: 'formula', name: 'Einstein-Hilbert Action', tex: 'S = \\frac{c^3}{16\\pi G} \\int (R-2\\Lambda)\\sqrt{-g}\\,d^4x + S_\\mathrm{matter}', tag: 'Action Principle', appliesTo: 'Derivation of GR', assumptions: 'Variation \\delta S = 0 yields field equations' },
-          { type: 'formula', name: 'Einstein Field Equation', tex: 'G_{\\mu\\nu} + \\Lambda g_{\\mu\\nu} = \\frac{8\\pi G}{c^4}T_{\\mu\\nu}', tag: 'Field Equation', appliesTo: 'Curved Spacetime', assumptions: 'Connects matter to geometry' },
-          { type: 'formula', name: 'Perfect Fluid Stress-Energy', tex: 'T^{\\mu\\nu} = \\left( \\rho+\\frac{P}{c^2} \\right)u^\\mu u^\\nu + Pg^{\\mu\\nu} \\quad \\implies \\quad \\nabla_\\mu T^{\\mu\\nu}=0', tag: 'Matter tensor', appliesTo: 'Cosmology, Stellar interiors', assumptions: 'Isotropic fluid' }
-        ]
-      },
-      {
-        title: 'Geodesics',
-        items: [
-          { type: 'formula', name: 'Geodesic Equation (Particles)', tex: '\\frac{d^2x^\\mu}{d\\tau^2} + \\Gamma^\\mu_{\\alpha\\beta} \\frac{dx^\\alpha}{d\\tau} \\frac{dx^\\beta}{d\\tau} = 0', tag: 'Motion', appliesTo: 'Massive bodies', assumptions: 'Free-fall' },
-          { type: 'formula', name: 'Geodesic Equation (Photons)', tex: 'k^\\mu\\nabla_\\mu k^\\nu=0 \\quad \\text{with} \\quad k^\\mu k_\\mu=0', tag: 'Motion', appliesTo: 'Light rays', assumptions: 'Null trajectories' }
-        ]
-      },
-      {
-        title: 'Weak Field & Newtonian Limits',
-        items: [
-          { type: 'formula', name: 'Weak Field Metric Limit', tex: 'g_{00} \\approx -\\left(1+\\frac{2\\Phi}{c^2}\\right) \\quad \\text{where} \\quad \\Phi=-\\frac{GM}{r}', tag: 'Approximation', appliesTo: 'Solar system', assumptions: 'Linearized gravity' },
-          { type: 'formula', name: 'Newtonian Limit of Einstein Eq', tex: 'G_{00} \\rightarrow \\frac{2}{c^2}\\nabla^2\\Phi \\implies \\nabla^2\\Phi=4\\pi G\\rho', tag: 'Proof Connection', appliesTo: 'Recovery of Classical Physics', assumptions: 'Slow motion, weak field' },
-          { type: 'formula', name: 'Relativistic Compactness', tex: 'C=\\frac{GM}{Rc^2}', tag: 'Metric property', appliesTo: 'Compact objects', assumptions: 'Dimensionless depth' },
-          { type: 'formula', name: 'Gravitational Time Dilation', tex: 'd\\tau = dt \\sqrt{1-\\frac{2GM}{rc^2}}', tag: 'Observable', appliesTo: 'Stationary observer', assumptions: 'Schwarzschild exterior' },
-          { type: 'formula', name: 'Fundamental Relativistic Redshift', tex: 'g= \\frac{\\nu_\\mathrm{obs}}{\\nu_\\mathrm{emit}} = \\frac{-k_\\mu u^\\mu_\\mathrm{obs}}{-k_\\mu u^\\mu_\\mathrm{emit}}', tag: 'Observable', appliesTo: 'Ray-tracing renderers', assumptions: 'General Spacetime formulation' },
-          { type: 'formula', name: 'Weak-Field Lensing Deflection', tex: '\\alpha= \\frac{4GM}{bc^2} \\quad,\\quad \\theta_E= \\sqrt{ \\frac{4GM}{c^2} \\frac{D_{LS}}{D_LD_S} }', tag: 'Observable', appliesTo: 'Einstein rings', assumptions: 'Small deflection angle' }
-        ]
-      },
-      {
-        title: 'Gravitational Waves',
-        items: [
-          { type: 'formula', name: 'Linearized Metric & Wave Equation', tex: 'g_{\\mu\\nu} = \\eta_{\\mu\\nu}+h_{\\mu\\nu} \\quad,\\quad \\Box h_{ij}^{TT}=0', tag: 'Wave Equation', appliesTo: 'Transverse-Traceless gauge', assumptions: 'Vacuum, far from source' },
-          { type: 'formula', name: 'Quadrupole Waveform', tex: 'h_{ij}^{TT} = \\frac{2G}{c^4D} \\ddot Q_{ij}^{TT}', tag: 'Generation', appliesTo: 'Binary systems', assumptions: 'Quadrupole approximation' },
-          { type: 'formula', name: 'GW Frequency', tex: 'f_\\mathrm{GW}=2f_\\mathrm{orb}', tag: 'Kinematics', appliesTo: 'Binaries', assumptions: 'Circular orbit dominant harmonic' },
-          { type: 'formula', name: 'Chirp Mass', tex: '\\mathcal M = \\frac{(m_1m_2)^{3/5}}{(m_1+m_2)^{1/5}}', tag: 'Mass Parameter', appliesTo: 'GW Inspiral phase', assumptions: 'Primary observable' },
-          { type: 'formula', name: 'Chirp Rate (Frequency Evolution)', tex: '\\dot f = \\frac{96}{5} \\pi^{8/3} \\left( \\frac{G\\mathcal M}{c^3} \\right)^{5/3} f^{11/3}', tag: 'Inspiral Dynamics', appliesTo: 'LIGO/LISA sources', assumptions: 'Energy loss drives inspiral' }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'blackholes',
-    title: 'Black Hole Physics',
-    sections: [
-      {
-        title: 'The Black Hole Metric Family',
-        items: [
-          { type: 'text', content: 'Classical solutions: Schwarzschild ($M$), Kerr ($M+J$), Reissner-Nordström ($M+Q$), Kerr-Newman ($M+J+Q$).' },
-          { type: 'formula', name: 'Schwarzschild Metric', tex: 'ds^2= -\\left(1-\\frac{2GM}{rc^2}\\right)c^2dt^2 + \\left(1-\\frac{2GM}{rc^2}\\right)^{-1}dr^2 +r^2d\\Omega^2', tag: 'Spacetime Metric', appliesTo: 'Static, neutral black holes', assumptions: 'Spherical symmetry, vacuum' },
-          { type: 'formula', name: 'Reissner-Nordström Horizons', tex: 'r_\\pm = \\frac{GM}{c^2} \\pm \\sqrt{ \\left(\\frac{GM}{c^2}\\right)^2 - \\frac{GQ^2}{4\\pi\\epsilon_0c^4} }', tag: 'Horizon Radius', appliesTo: 'Charged, non-rotating holes', assumptions: 'Spherical symmetry' },
-          { type: 'formula', name: 'Kerr Metric', tex: 'ds^2= -\\left(1-\\frac{2r_gr}{\\Sigma}\\right)c^2dt^2 -\\frac{4r_gar\\sin^2\\theta}{\\Sigma}c\\,dt\\,d\\phi +\\frac{\\Sigma}{\\Delta}dr^2 +\\Sigma d\\theta^2 + \\left( r^2+a^2+ \\frac{2r_ga^2r\\sin^2\\theta}{\\Sigma} \\right) \\sin^2\\theta\\,d\\phi^2', tag: 'Spacetime Metric', appliesTo: 'Rotating black holes', assumptions: 'Axisymmetric, vacuum' }
-        ]
-      },
-      {
-        title: 'Kerr Horizons & Ergospheres',
-        items: [
-          { type: 'text', content: 'For Kerr: $r_g=GM/c^2$, $a=J/Mc$, $a_*=cJ/GM^2$, $\\Sigma=r^2+a^2\\cos^2\\theta$, $\\Delta=r^2-2r_gr+a^2$' },
-          { type: 'formula', name: 'Kerr Extremality Limit', tex: '|a_*|\\le 1', tag: 'Physical Limit', appliesTo: 'Cosmic censorship', assumptions: 'Prevents naked singularities' },
-          { type: 'formula', name: 'Kerr Event Horizons', tex: 'r_\\pm= \\frac{GM}{c^2} \\pm \\sqrt{ \\left(\\frac{GM}{c^2}\\right)^2-a^2 } \\quad,\\quad r_+=r_g+\\sqrt{r_g^2-a^2}', tag: 'Horizon Radius', appliesTo: 'Outer and Inner boundaries', assumptions: 'a < GM/c^2' },
-          { type: 'formula', name: 'Horizon Identities', tex: 'r_+r_-=a^2 \\quad,\\quad r_++r_-=2r_g', tag: 'Mathematical Property', appliesTo: 'Metric simplifications', assumptions: 'Kerr Geometry' },
-          { type: 'formula', name: 'Ergosphere (Static Limit)', tex: 'r_\\mathrm{ergo} = r_g+\\sqrt{r_g^2-a^2\\cos^2\\theta}', tag: 'Boundary', appliesTo: 'Region where frame-dragging > c', assumptions: 'Penrose process possible' },
-          { type: 'formula', name: 'Frame Dragging (Lense-Thirring vs Exact)', tex: '\\Omega_\\mathrm{LT} \\approx \\frac{2GJ}{c^2r^3} \\quad,\\quad \\omega=-\\frac{g_{t\\phi}}{g_{\\phi\\phi}}', tag: 'Frame Dragging', appliesTo: 'Space dragging rate', assumptions: 'ZAMO observer' }
-        ]
-      },
-      {
-        title: 'Kerr Ray Tracing & Photon Dynamics',
-        items: [
-          { type: 'text', content: 'For accurate Kerr rendering, trajectories depend on Constants of Motion ($E, L_z, Q$).' },
-          { type: 'formula', name: 'Kerr Radial & Polar Potentials', tex: '\\mathcal R(r) = \\left[E(r^2+a^2)-aL_z\\right]^2 - \\Delta \\left[ Q+(L_z-aE)^2 \\right] \\quad,\\quad \\Theta(\\theta) = Q - \\cos^2\\theta \\left[ a^2E^2- \\frac{L_z^2}{\\sin^2\\theta} \\right]', tag: 'Geodesic Potentials', appliesTo: 'Trajectory boundary conditions', assumptions: 'Kerr spacetime' },
-          { type: 'formula', name: 'Kerr Trajectory Equations', tex: '\\Sigma^2 \\left(\\frac{dr}{d\\lambda}\\right)^2 = \\mathcal R(r) \\quad,\\quad \\Sigma^2 \\left(\\frac{d\\theta}{d\\lambda}\\right)^2 = \\Theta(\\theta)', tag: 'First-Order ODEs', appliesTo: 'Ray tracing engines', assumptions: 'Affine parameter \\lambda' },
-          { type: 'formula', name: 'Kerr Circular Photon Orbits', tex: '\\mathcal R(r)=0 \\quad,\\quad \\frac{d\\mathcal R}{dr}=0', tag: 'Unstable Orbits', appliesTo: 'Defines the photon shell', assumptions: 'Spin-dependent radii' },
-          { type: 'formula', name: 'Kerr Celestial Coordinates (Shadow)', tex: '\\alpha = -\\frac{\\xi}{\\sin\\theta_o} \\quad,\\quad \\beta = \\pm \\sqrt{\\eta +a^2\\cos^2\\theta_o -\\xi^2\\cot^2\\theta_o}', tag: 'Image Plane Coords', appliesTo: 'Shadow contour rendering', assumptions: '\\xi=L_z/E, \\eta=Q/E^2' }
-        ]
-      }
-    ]
-  },
-  {
-    id: 'bhthermo',
-    title: 'Black Hole Thermodynamics',
-    sections: [
-      {
-        title: 'Temperature, Entropy & Mechanics',
-        items: [
-          { type: 'formula', name: 'Kerr Horizon Area', tex: 'A=4\\pi(r_+^2+a^2) \\quad \\text{or} \\quad A=8\\pi r_g \\left( r_g+\\sqrt{r_g^2-a^2} \\right)', tag: 'Geometric Property', appliesTo: 'Outer horizon', assumptions: 'Stationary black hole' },
-          { type: 'formula', name: 'Surface Gravity', tex: '\\kappa = \\frac{c^2(r_+-r_-)}{2(r_+^2+a^2)}', tag: 'Geometric Property', appliesTo: 'Acceleration at horizon', assumptions: 'Kerr geometry' },
-          { type: 'formula', name: 'Hawking Temperature', tex: 'T_H= \\frac{\\hbar\\kappa}{2\\pi k_Bc}', tag: 'Quantum Emission', appliesTo: 'Black hole evaporation', assumptions: 'QFT in curved spacetime' },
-          { type: 'formula', name: 'Bekenstein-Hawking Entropy', tex: 'S_\\mathrm{BH} = \\frac{k_Bc^3A}{4G\\hbar} = \\frac{k_BA}{4l_P^2}', tag: 'Thermodynamics', appliesTo: 'Information paradox limits', assumptions: 'Holographic principle' },
-          { type: 'formula', name: 'Angular Velocity of Horizon', tex: '\\Omega_H = \\frac{ac}{r_+^2+a^2}', tag: 'Kinematics', appliesTo: 'Black hole rotation', assumptions: 'Rigid rotation of horizon' },
-          { type: 'formula', name: 'First Law of BH Mechanics', tex: 'd(Mc^2) = T_HdS + \\Omega_HdJ + \\Phi_HdQ', tag: 'Energy Conservation', appliesTo: 'Perturbed black holes', assumptions: 'Thermodynamic equivalence' },
-          { type: 'formula', name: 'Second Law (Area Theorem)', tex: '\\Delta A\\ge0', tag: 'Thermodynamics', appliesTo: 'Classical BH mergers', assumptions: 'Null energy condition holds' }
+          { type: 'formula', name: 'Riemann Curvature Tensor', tex: 'R^\\rho_{\\ \\sigma\\mu\\nu} = \\partial_\\mu\\Gamma^\\rho_{\\nu\\sigma} -\\partial_\\nu\\Gamma^\\rho_{\\mu\\sigma} +\\Gamma^\\rho_{\\mu\\lambda}\\Gamma^\\lambda_{\\nu\\sigma} -\\Gamma^\\rho_{\\nu\\lambda}\\Gamma^\\lambda_{\\mu\\sigma}', tag: 'Geometry', appliesTo: 'Spacetime curvature', assumptions: 'Levi-Civita connection' },
+          { type: 'formula', name: 'Ricci Tensor & Scalar', tex: 'R_{\\mu\\nu} = R^\\rho_{\\ \\mu\\rho\\nu} \\quad,\\quad R=g^{\\mu\\nu}R_{\\mu\\nu}', tag: 'Geometry Traces', appliesTo: 'Volume changes', assumptions: 'Contractions of Riemann' },
+          { type: 'formula', name: 'Einstein Tensor', tex: 'G_{\\mu\\nu} = R_{\\mu\\nu} -\\frac12Rg_{\\mu\\nu}', tag: 'Geometry', appliesTo: 'Divergence-free curvature', assumptions: 'Bianchi identity compliance' },
+          { type: 'formula', name: 'Einstein Field Equation', tex: 'G_{\\mu\\nu} + \\Lambda g_{\\mu\\nu} = \\frac{8\\pi G}{c^4}T_{\\mu\\nu}', tag: 'Field Equation', appliesTo: 'Spacetime dynamics', assumptions: 'Coupling geometry to matter' },
+          { type: 'formula', name: 'Einstein-Hilbert Action', tex: 'S_{EH} = \\frac{c^3}{16\\pi G} \\int(R-2\\Lambda)\\sqrt{-g}\\,d^4x', tag: 'Action', appliesTo: 'Derivation of GR', assumptions: 'Principle of least action' },
+          { type: 'formula', name: 'Energy-Momentum Conservation', tex: '\\nabla_\\mu T^{\\mu\\nu}=0', tag: 'Conservation', appliesTo: 'Matter fields', assumptions: 'Local conservation law' },
+          { type: 'formula', name: 'Geodesic Equation', tex: '\\frac{d^2x^\\mu}{d\\lambda^2} + \\Gamma^\\mu_{\\alpha\\beta} \\frac{dx^\\alpha}{d\\lambda} \\frac{dx^\\beta}{d\\lambda} = 0', tag: 'Motion', appliesTo: 'Free-fall', assumptions: 'Affine parametrization' }
         ]
       }
     ]
   },
   {
     id: 'stellar',
-    title: 'Stellar Astrophysics & Remnants',
+    title: '9. Stellar Structure & Nuclear Physics',
     sections: [
       {
-        title: 'Complete Stellar Structure',
+        title: 'Equations of Stellar Structure',
         items: [
-          { type: 'text', content: 'The Four Equations of Stellar Structure:' },
-          { type: 'formula', name: 'Mass Conservation', tex: '\\frac{dm}{dr}=4\\pi r^2\\rho', tag: 'Structure Equation', appliesTo: 'Stellar interiors', assumptions: 'Spherical symmetry' },
-          { type: 'formula', name: 'Hydrostatic Equilibrium', tex: '\\frac{dP}{dr} = -\\frac{Gm\\rho}{r^2}', tag: 'Structure Equation', appliesTo: 'Stellar interiors', assumptions: 'Newtonian gravity, no acceleration' },
-          { type: 'formula', name: 'Energy Generation', tex: '\\frac{dL}{dr} = 4\\pi r^2\\rho\\epsilon', tag: 'Structure Equation', appliesTo: 'Nuclear cores', assumptions: 'Local energy production' },
-          { type: 'formula', name: 'Radiative Transport', tex: '\\frac{dT}{dr} = -\\frac{3\\kappa\\rho L}{16\\pi acT^3r^2}', tag: 'Structure Equation', appliesTo: 'Radiative zones', assumptions: 'Diffusion approximation' },
-          { type: 'formula', name: 'Nuclear Energy Rate', tex: 'r_{12} = n_1n_2 \\langle\\sigma v\\rangle \\quad,\\quad \\epsilon_\\mathrm{nuc} = \\frac{Q\\,r_{12}}{\\rho}', tag: 'Nuclear Physics', appliesTo: 'Fusion cores', assumptions: 'Q = \\Delta mc^2' }
+          { type: 'formula', name: 'Mass Conservation', tex: '\\frac{dm}{dr}=4\\pi r^2\\rho', tag: 'Structure', appliesTo: 'Stellar interiors', assumptions: 'Spherical symmetry, stationary' },
+          { type: 'formula', name: 'Hydrostatic Equilibrium', tex: '\\frac{dP}{dr} = -\\frac{Gm\\rho}{r^2}', tag: 'Structure', appliesTo: 'Pressure vs Gravity', assumptions: 'Newtonian limit' },
+          { type: 'formula', name: 'Energy Generation', tex: '\\frac{dL}{dr} = 4\\pi r^2\\rho\\epsilon', tag: 'Structure', appliesTo: 'Luminosity gradient', assumptions: 'Local energy production' },
+          { type: 'formula', name: 'Radiative Energy Transport', tex: '\\frac{dT}{dr} = -\\frac{3\\kappa\\rho L}{16\\pi acT^3r^2}', tag: 'Transport', appliesTo: 'Radiative zones', assumptions: 'Diffusion approximation' }
         ]
       },
       {
-        title: 'Polytropes & Lane-Emden',
+        title: 'Nuclear & Opacity',
         items: [
-          { type: 'text', content: 'For polytropic stars ($P=K\\rho^{1+1/n}$):' },
-          { type: 'formula', name: 'Lane-Emden Equation', tex: '\\frac1{\\xi^2} \\frac{d}{d\\xi} \\left( \\xi^2\\frac{d\\theta}{d\\xi} \\right) + \\theta^n=0', tag: 'Structure Equation', appliesTo: 'Simplified stellar models', assumptions: 'Hydrostatic polytrope' },
-          { type: 'formula', name: 'Scaling Relations', tex: '\\rho=\\rho_c\\theta^n \\quad,\\quad r=\\alpha\\xi \\quad,\\quad \\alpha^2 = \\frac{(n+1)K}{4\\pi G} \\rho_c^{1/n-1}', tag: 'Model Mapping', appliesTo: 'Physical dimensions', assumptions: 'Polytropic index n' },
-          { type: 'formula', name: 'Total Mass', tex: 'M = 4\\pi\\alpha^3\\rho_c \\left(-\\xi^2\\frac{d\\theta}{d\\xi}\\right)_{\\xi_1}', tag: 'Integration Result', appliesTo: 'Stellar mass', assumptions: 'Evaluated at surface \\xi_1' }
-        ]
-      },
-      {
-        title: 'Neutron Stars',
-        items: [
-          { type: 'text', content: 'Relativistic TOV System:' },
-          { type: 'formula', name: 'TOV Equation', tex: '\\frac{dP}{dr} = -\\frac{G \\left(\\rho+\\frac{P}{c^2}\\right) \\left(m+\\frac{4\\pi r^3P}{c^2}\\right)}{r^2 \\left(1-\\frac{2Gm}{rc^2}\\right)}', tag: 'Relativistic Structure', appliesTo: 'Neutron star interiors', assumptions: 'General Relativity, Spherical' },
-          { type: 'formula', name: 'EOS Closure & Conditions', tex: 'P=P(\\epsilon) \\quad,\\quad m(0)=0 \\quad,\\quad P(0)=P_c \\quad,\\quad P(R)=0', tag: 'Boundary Conditions', appliesTo: 'TOV integration', assumptions: 'Central pressure P_c defines mass' },
-          { type: 'formula', name: 'Binding Energy & Tidal Deformability', tex: 'E_\\mathrm{bind} \\approx (M_b-M_g)c^2 \\quad,\\quad \\Lambda= \\frac{2}{3}k_2 \\left(\\frac{Rc^2}{GM}\\right)^5', tag: 'Properties', appliesTo: 'NS mergers, Gravitational waves', assumptions: 'Nuclear EOS dependent' },
-          { type: 'text', content: 'For realistic rotating models, the Hartle-Thorne slow-rotation formalism ($J, Q_\\mathrm{quad}, \\omega(r)$) must replace simple Newtonian limits.' },
-          { type: 'formula', name: 'Newtonian Mass-Shedding Estimate', tex: '\\Omega_K\\approx \\sqrt{\\frac{GM}{R^3}}', tag: 'Kinematics', appliesTo: 'Millisecond pulsars', assumptions: 'Non-relativistic breakup limit' }
-        ]
-      },
-      {
-        title: 'Pulsars & Magnetars',
-        items: [
-          { type: 'formula', name: 'Magnetic Dipole Field & Vector Potential', tex: 'B_r= \\frac{2\\mu\\cos\\theta}{r^3} \\quad,\\quad B_\\theta= \\frac{\\mu\\sin\\theta}{r^3} \\quad,\\quad A_\\phi= \\frac{\\mu\\sin\\theta}{r^2}', tag: 'Magnetic Field', appliesTo: 'Pulsar magnetosphere', assumptions: 'Ideal dipole' },
-          { type: 'formula', name: 'Polar Cap Radius', tex: 'r_\\mathrm{pc} \\approx R \\sqrt{\\frac{R}{R_\\mathrm{LC}}}', tag: 'Magnetosphere', appliesTo: 'Open field line region', assumptions: 'Dipole geometry' },
-          { type: 'formula', name: 'Pulsar Spin-Down & Braking Index', tex: '\\dot E = -\\frac{2\\mu^2\\Omega^4\\sin^2\\alpha}{3c^3} \\quad,\\quad \\dot\\Omega\\propto-\\Omega^n \\quad,\\quad n= \\frac{\\Omega\\ddot\\Omega}{\\dot\\Omega^2}', tag: 'Energy Loss', appliesTo: 'Radio pulsars', assumptions: 'Vacuum dipole radiation' },
-          { type: 'formula', name: 'Integrated Braking Law', tex: '\\Omega(t)^{1-n} = \\Omega_0^{1-n} + (n-1)Kt', tag: 'Evolution', appliesTo: 'Pulsar spin history', assumptions: 'Constant braking index n != 1' },
-          { type: 'formula', name: 'Light Cylinder & GJ Density', tex: 'R_\\mathrm{LC}= \\frac{c}{\\Omega} \\quad,\\quad \\rho_\\mathrm{GJ} \\approx -\\frac{\\mathbf\\Omega\\cdot\\mathbf B}{2\\pi c}', tag: 'Magnetosphere', appliesTo: 'Co-rotating plasma limits', assumptions: 'Force-free electrodynamics' },
-          { type: 'formula', name: 'Magnetar Timescales', tex: 't_\\mathrm{Ohm} \\sim \\frac{L^2}{\\eta} \\quad,\\quad t_\\mathrm{Hall} \\sim \\frac{4\\pi en_eL^2}{cB}', tag: 'Magnetic Evolution', appliesTo: 'Magnetar crusts', assumptions: 'Conductivity vs Hall drift' },
-          { type: 'formula', name: 'Magnetic Stress Tensor', tex: 'T_{ij}^{(B)} = \\frac{1}{4\\pi} \\left( B_iB_j -\\frac12B^2\\delta_{ij} \\right)', tag: 'Stress-Energy', appliesTo: 'Magnetar structure', assumptions: 'Gaussian-cgs units' }
+          { type: 'formula', name: 'Nuclear Reaction Rate', tex: 'r_{12} = n_1n_2\\langle\\sigma v\\rangle', tag: 'Nuclear Physics', appliesTo: 'Fusion processes', assumptions: 'Maxwell-Boltzmann velocities' },
+          { type: 'formula', name: 'Energy Release (Q-value)', tex: 'Q=\\Delta mc^2', tag: 'Energy', appliesTo: 'Exothermic reactions', assumptions: 'Mass defect' },
+          { type: 'text', content: 'Total energy generation $\\epsilon$ includes nuclear energy $\\epsilon_{nuc}$ minus neutrino losses $\\epsilon_\\nu$. Opacity $\\kappa$ aggregates electron scattering, free-free, bound-free, and bound-bound transitions.' }
         ]
       }
     ]
   },
   {
-    id: 'highenergy',
-    title: 'High-Energy (Accretion & Jets)',
+    id: 'dwarfs',
+    title: '10. White Dwarfs & Brown Dwarfs',
     sections: [
       {
-        title: 'Accretion & Disks',
+        title: 'White Dwarfs',
         items: [
-          { type: 'formula', name: 'Eddington Luminosity', tex: 'L_\\mathrm{Edd} = \\frac{4\\pi GMm_pc}{\\sigma_T} \\approx 1.26\\times10^{38} \\left(\\frac{M}{M_\\odot}\\right) \\mathrm{erg\\,s^{-1}}', tag: 'Radiation Limit', appliesTo: 'Spherical accretion', assumptions: 'Thomson scattering dominates' },
-          { type: 'formula', name: 'Kerr ISCO', tex: 'r_\\mathrm{ISCO} = r_g \\left[ 3+Z_2 - s\\sqrt{(3-Z_1)(3+Z_1+2Z_2)} \\right]', tag: 'Inner Disk Boundary', appliesTo: 'Rotating BH disks', assumptions: 's=+1 (prograde) or -1 (retrograde)' },
-          { type: 'formula', name: 'Kerr Disk Orbital Velocity', tex: '\\Omega_\\pm = \\frac{c^3}{GM} \\frac{1}{r_*^{3/2}\\pm a_*}', tag: 'Kinematics', appliesTo: 'Relativistic disk fluid', assumptions: 'Circular Keplerian orbits' },
-          { type: 'formula', name: 'Invariant Intensity (Ray Tracing)', tex: 'I_{\\nu,\\mathrm{obs}} = g^3 I_{\\nu,\\mathrm{emit}} \\quad \\text{where} \\quad g= \\frac{\\nu_\\mathrm{obs}}{\\nu_\\mathrm{emit}}', tag: 'Observable', appliesTo: 'Relativistic rendering', assumptions: 'I_\\nu/\\nu^3 = constant' }
+          { type: 'formula', name: 'Electron Number Density', tex: 'n_e=\\frac{\\rho}{\\mu_em_u}', tag: 'State Variable', appliesTo: 'Degenerate cores', assumptions: 'Fully ionized matter' },
+          { type: 'formula', name: 'Non-Relativistic Degeneracy', tex: 'P\\propto\\rho^{5/3} \\implies R\\propto M^{-1/3}', tag: 'EOS', appliesTo: 'Low-mass white dwarfs', assumptions: 'Polytrope n=1.5' },
+          { type: 'formula', name: 'Ultra-Relativistic Degeneracy', tex: 'P\\propto\\rho^{4/3}', tag: 'EOS', appliesTo: 'High-mass approaching limit', assumptions: 'Polytrope n=3' },
+          { type: 'formula', name: 'Chandrasekhar Mass Limit', tex: 'M_{Ch} \\approx \\frac{5.83}{\\mu_e^2}M_\\odot', tag: 'Stability Limit', appliesTo: 'Maximum WD mass', assumptions: 'Zero temperature ideal Fermi gas' }
         ]
       },
       {
-        title: 'Quasars, Jets & Cooling',
+        title: 'Brown Dwarfs',
         items: [
-          { type: 'formula', name: 'Blandford-Znajek Jet Power', tex: 'P_\\mathrm{BZ} \\propto \\Phi_B^2\\Omega_H^2/c', tag: 'Jet Launching', appliesTo: 'Quasar / AGN jets', assumptions: 'Magnetic field threads Kerr horizon' },
-          { type: 'formula', name: 'Relativistic Beaming', tex: '\\delta= \\frac{1}{\\Gamma(1-\\beta\\cos\\theta)} \\quad,\\quad \\beta_\\mathrm{app} = \\frac{\\beta\\sin\\theta}{1-\\beta\\cos\\theta}', tag: 'Kinematics', appliesTo: 'Jet apparent superluminal motion', assumptions: '\\Gamma = (1-\\beta^2)^{-1/2}' },
-          { type: 'formula', name: 'Synchrotron Frequency & Power', tex: '\\nu_c = \\frac{3}{2}\\gamma^2 \\frac{eB\\sin\\alpha}{2\\pi m_e} \\quad,\\quad P_\\mathrm{syn} = \\frac{4}{3} \\sigma_Tc \\gamma^2 \\beta^2 U_B', tag: 'Non-thermal Emission', appliesTo: 'Jet radio/X-ray emission', assumptions: 'U_B = B^2/8pi' },
-          { type: 'formula', name: 'Synchrotron Cooling Time', tex: 't_\\mathrm{syn} = \\frac{\\gamma m_ec^2}{P_\\mathrm{syn}}', tag: 'Plasma Physics', appliesTo: 'Electron energy loss', assumptions: 'Continuous injection needed' },
-          { type: 'formula', name: 'Inverse Compton Power', tex: 'P_\\mathrm{IC} = \\frac43\\sigma_Tc\\gamma^2\\beta^2U_\\mathrm{rad} \\quad \\implies \\quad P_\\mathrm{loss} = P_\\mathrm{syn}+P_\\mathrm{IC}', tag: 'Scattering', appliesTo: 'X-ray/Gamma-ray emission', assumptions: 'Thomson regime' },
-          { type: 'formula', name: 'Pair Production Threshold', tex: 'E_1E_2(1-\\cos\\theta) \\ge 2(m_ec^2)^2', tag: 'Quantum Electrodynamics', appliesTo: 'Gamma-ray opacity in jets', assumptions: '\\gamma + \\gamma \\rightarrow e^- + e^+' }
+          { type: 'text', content: 'Supported by ideal gas pressure, electron degeneracy, and partial degeneracy. Ruled by Kelvin-Helmholtz cooling.' },
+          { type: 'formula', name: 'Surface Luminosity', tex: 'L=4\\pi R^2\\sigma T_\\mathrm{eff}^4', tag: 'Emission', appliesTo: 'Cooling curves', assumptions: 'Blackbody radiator approximation' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'neutron_stars',
+    title: '11. Neutron Stars',
+    sections: [
+      {
+        title: 'Relativistic Structure',
+        items: [
+          { type: 'formula', name: 'Mass Equation', tex: '\\frac{dm}{dr}=4\\pi r^2\\epsilon/c^2', tag: 'Structure', appliesTo: 'Energy density integration', assumptions: 'General relativity' },
+          { type: 'formula', name: 'TOV Equation', tex: '\\frac{dP}{dr} = -\\frac{G \\left(\\rho+\\frac{P}{c^2}\\right) \\left(m+\\frac{4\\pi r^3P}{c^2}\\right)}{r^2 \\left(1-\\frac{2Gm}{rc^2}\\right)}', tag: 'Structure', appliesTo: 'Hydrostatic equilibrium', assumptions: 'Spherical symmetry, GR' },
+          { type: 'formula', name: 'Equation of State Closure', tex: 'P=P(\\epsilon)', tag: 'Closure', appliesTo: 'Nuclear matter', assumptions: 'Cold, catalyzed matter' },
+          { type: 'formula', name: 'Boundary Conditions', tex: 'm(0)=0 \\quad,\\quad P(0)=P_c \\quad,\\quad P(R)=0', tag: 'Integration Limits', appliesTo: 'Numerical modeling', assumptions: 'Surface at zero pressure' }
+        ]
+      },
+      {
+        title: 'Observables & Deformation',
+        items: [
+          { type: 'formula', name: 'Compactness', tex: 'C=\\frac{GM}{Rc^2}', tag: 'Parameter', appliesTo: 'Relativistic strength', assumptions: 'Dimensionless' },
+          { type: 'formula', name: 'Surface Redshift', tex: '1+z= \\left(1-\\frac{2GM}{Rc^2}\\right)^{-1/2}', tag: 'Observable', appliesTo: 'Surface emission', assumptions: 'Schwarzschild exterior' },
+          { type: 'formula', name: 'Binding Energy', tex: 'E_B=(M_b-M_g)c^2', tag: 'Energy', appliesTo: 'Supernova collapse', assumptions: 'Baryonic vs Gravitational mass' },
+          { type: 'formula', name: 'Tidal Deformability', tex: '\\Lambda= \\frac23k_2C^{-5}', tag: 'Property', appliesTo: 'GW inspiring phase', assumptions: 'Linear tidal response' },
+          { type: 'formula', name: 'Moment of Inertia & Rot Energy', tex: 'J=I\\Omega \\quad,\\quad E_\\mathrm{rot} = \\frac12I\\Omega^2', tag: 'Kinematics', appliesTo: 'Spinning NS', assumptions: 'Rigid rotation approximation' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'pulsars',
+    title: '12. Pulsars & Magnetars',
+    sections: [
+      {
+        title: 'Pulsar Rotation & Emission',
+        items: [
+          { type: 'formula', name: 'Period & Rotational Energy Loss', tex: 'P=\\frac{2\\pi}{\\Omega} \\quad,\\quad \\dot E_\\mathrm{rot} = -I\\Omega\\dot\\Omega', tag: 'Kinematics', appliesTo: 'Spin-down luminosity', assumptions: 'Constant Moment of Inertia' },
+          { type: 'formula', name: 'Magnetic Dipole Field', tex: 'B_r=\\frac{2\\mu\\cos\\theta}{r^3} \\quad,\\quad B_\\theta= \\frac{\\mu\\sin\\theta}{r^3}', tag: 'Magnetosphere', appliesTo: 'Surface field', assumptions: 'Ideal dipole' },
+          { type: 'formula', name: 'Dipole Spin-Down Radiation', tex: '\\dot E = -\\frac{2\\mu^2\\Omega^4\\sin^2\\alpha}{3c^3}', tag: 'Energy Loss', appliesTo: 'Vacuum radiation', assumptions: 'Magnetic axis offset by alpha' },
+          { type: 'formula', name: 'Braking Index', tex: 'n= \\frac{\\Omega\\ddot\\Omega}{\\dot\\Omega^2}', tag: 'Evolution', appliesTo: 'Timing observations', assumptions: 'Power-law spin-down' },
+          { type: 'formula', name: 'Light Cylinder', tex: 'R_{LC}=\\frac c\\Omega', tag: 'Boundary', appliesTo: 'Magnetosphere limit', assumptions: 'Co-rotation velocity reaches c' },
+          { type: 'formula', name: 'Goldreich-Julian Density', tex: '\\rho_{GJ} \\approx -\\frac{\\mathbf\\Omega\\cdot\\mathbf B}{2\\pi c}', tag: 'Plasma', appliesTo: 'Magnetosphere filling', assumptions: 'Force-free E dot B = 0' }
+        ]
+      },
+      {
+        title: 'Magnetars',
+        items: [
+          { type: 'formula', name: 'Magnetic Energy Density', tex: 'u_B=\\frac{B^2}{8\\pi}', tag: 'Energy', appliesTo: 'Crustal stress', assumptions: 'cgs units' },
+          { type: 'formula', name: 'Ohmic Decay Timescale', tex: 't_\\mathrm{Ohm}\\sim\\frac{L^2}{\\eta}', tag: 'Timescale', appliesTo: 'Field dissipation', assumptions: 'Resistive crust' },
+          { type: 'formula', name: 'Hall Drift Timescale', tex: 't_\\mathrm{Hall} \\sim \\frac{4\\pi en_eL^2}{cB}', tag: 'Timescale', appliesTo: 'Field reconfiguration', assumptions: 'Electron fluid drift' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'bh_physics',
+    title: '13. Black Hole Physics',
+    sections: [
+      {
+        title: 'Non-Rotating Black Holes',
+        items: [
+          { type: 'text', content: 'Schwarzschild (mass $M$) and Reissner-Nordström (mass $M$, charge $Q$).' },
+          { type: 'formula', name: 'Schwarzschild Metric', tex: 'ds^2= -\\left(1-\\frac{2GM}{rc^2}\\right)c^2dt^2 + \\left(1-\\frac{2GM}{rc^2}\\right)^{-1}dr^2 +r^2d\\Omega^2', tag: 'Spacetime', appliesTo: 'Static, neutral BH', assumptions: 'Spherical symmetry, vacuum' },
+          { type: 'formula', name: 'Reissner-Nordström Horizons', tex: 'r_\\pm = \\frac{GM}{c^2} \\pm \\sqrt{ \\left(\\frac{GM}{c^2}\\right)^2 - \\frac{GQ^2}{4\\pi\\epsilon_0c^4} }', tag: 'Horizons', appliesTo: 'Charged BH', assumptions: 'Extremal limit avoids naked singularity' }
+        ]
+      },
+      {
+        title: 'Rotating (Kerr) Black Holes',
+        items: [
+          { type: 'text', content: 'Kerr (mass $M$, spin $J$). Parameters: $a=J/Mc$, $a_*=cJ/GM^2$, $\\Sigma=r^2+a^2\\cos^2\\theta$, $\\Delta=r^2-2r_gr+a^2$.' },
+          { type: 'formula', name: 'Kerr Metric', tex: 'ds^2= -\\left(1-\\frac{2r_gr}{\\Sigma}\\right)c^2dt^2 -\\frac{4r_gar\\sin^2\\theta}{\\Sigma}c\\,dt\\,d\\phi +\\frac{\\Sigma}{\\Delta}dr^2 +\\Sigma d\\theta^2 + \\left( r^2+a^2+ \\frac{2r_ga^2r\\sin^2\\theta}{\\Sigma} \\right) \\sin^2\\theta\\,d\\phi^2', tag: 'Spacetime', appliesTo: 'Astrophysical BHs', assumptions: 'Axisymmetric, vacuum' },
+          { type: 'formula', name: 'Event Horizons', tex: 'r_\\pm= r_g \\pm \\sqrt{r_g^2-a^2}', tag: 'Horizons', appliesTo: 'Inner/Outer boundaries', assumptions: 'Sub-extremal spin' },
+          { type: 'formula', name: 'Ergosphere', tex: 'r_\\mathrm{ergo} = r_g+\\sqrt{r_g^2-a^2\\cos^2\\theta}', tag: 'Boundary', appliesTo: 'Static limit surface', assumptions: 'Penrose process region' }
+        ]
+      },
+      {
+        title: 'Geodesics & Rendering',
+        items: [
+          { type: 'formula', name: 'First-Order Kerr Geodesics', tex: '\\Sigma^2 \\left(\\frac{dr}{d\\lambda}\\right)^2 = \\mathcal R(r) \\quad,\\quad \\Sigma^2 \\left(\\frac{d\\theta}{d\\lambda}\\right)^2 = \\Theta(\\theta)', tag: 'Motion', appliesTo: 'Ray tracing', assumptions: 'Separation of variables (Carter)' },
+          { type: 'formula', name: 'Photon Orbits (Spherical)', tex: '\\mathcal R=0 \\quad,\\quad \\frac{d\\mathcal R}{dr}=0', tag: 'Constraints', appliesTo: 'Unstable photon shells', assumptions: 'Defines shadow boundary' },
+          { type: 'formula', name: 'Black Hole Shadow Coordinates', tex: '\\alpha=-\\frac{\\xi}{\\sin\\theta_o} \\quad,\\quad \\beta= \\pm \\sqrt{ \\eta+a^2\\cos^2\\theta_o-\\xi^2\\cot^2\\theta_o }', tag: 'Image Plane', appliesTo: 'Observer screen', assumptions: 'Impact parameters xi, eta' },
+          { type: 'formula', name: 'Relativistic Redshift', tex: 'g= \\frac{-k_\\mu u^\\mu_\\mathrm{obs}}{-k_\\mu u^\\mu_\\mathrm{emit}}', tag: 'Observable', appliesTo: 'Doppler + Gravitational', assumptions: 'General observer framing' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'bh_thermo',
+    title: '14. Black Hole Thermodynamics',
+    sections: [
+      {
+        title: 'Properties & Laws',
+        items: [
+          { type: 'formula', name: 'Horizon Area (Kerr)', tex: 'A=4\\pi(r_+^2+a^2)', tag: 'Geometry', appliesTo: 'Outer horizon', assumptions: 'Stationary state' },
+          { type: 'formula', name: 'Surface Gravity', tex: '\\kappa= \\frac{c^2(r_+-r_-)}{2(r_+^2+a^2)}', tag: 'Geometry', appliesTo: 'Horizon acceleration', assumptions: 'Evaluated at r_+' },
+          { type: 'text', content: 'STATUS: Hawking Radiation is a semiclassical theoretical prediction; not directly experimentally detected.' },
+          { type: 'formula', name: 'Hawking Temperature', tex: 'T_H= \\frac{\\hbar\\kappa}{2\\pi k_Bc}', tag: 'Quantum Emission', appliesTo: 'Black hole evaporation', assumptions: 'QFT in curved spacetime' },
+          { type: 'formula', name: 'Bekenstein-Hawking Entropy', tex: 'S_{BH} = \\frac{k_Bc^3A}{4G\\hbar}', tag: 'Thermodynamics', appliesTo: 'Information paradox', assumptions: 'Holographic principle' },
+          { type: 'formula', name: 'Horizon Angular Velocity', tex: '\\Omega_H= \\frac{ac}{r_+^2+a^2}', tag: 'Kinematics', appliesTo: 'Co-rotating frames', assumptions: 'Rigid body-like rotation' },
+          { type: 'formula', name: 'First Law of BH Mechanics', tex: 'd(Mc^2) = T_HdS+\\Omega_HdJ+\\Phi_HdQ', tag: 'Conservation', appliesTo: 'Perturbations', assumptions: 'Thermodynamic equivalence' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'accretion',
+    title: '15. Accretion Disks & Relativistic Astrophysics',
+    sections: [
+      {
+        title: 'Disk Physics',
+        items: [
+          { type: 'formula', name: 'Mass Accretion Rate', tex: '\\dot M = 4\\pi r^2\\rho v_r', tag: 'Flow', appliesTo: 'Spherical/Disk inflow', assumptions: 'Steady state' },
+          { type: 'formula', name: 'Eddington Luminosity', tex: 'L_{Edd} = \\frac{4\\pi GMm_pc}{\\sigma_T}', tag: 'Limit', appliesTo: 'Radiation pressure balancing gravity', assumptions: 'Thomson scattering, pure hydrogen' },
+          { type: 'formula', name: 'Eddington Ratio', tex: '\\lambda_{Edd} = \\frac{L}{L_{Edd}}', tag: 'Parameter', appliesTo: 'Accretion efficiency', assumptions: 'Observed vs Maximum' },
+          { type: 'formula', name: 'Innermost Stable Circular Orbit (Kerr)', tex: 'r_\\mathrm{ISCO} = r_g \\left[ 3+Z_2 - s\\sqrt{(3-Z_1)(3+Z_1+2Z_2)} \\right]', tag: 'Boundary', appliesTo: 'Inner edge of accretion disk', assumptions: 's=1 (prograde) or -1 (retrograde)' }
+        ]
+      },
+      {
+        title: 'Relativistic Ray Tracing Pipeline',
+        items: [
+          { type: 'text', content: 'Simulation logic: metric $\\rightarrow$ geodesic $\\rightarrow$ redshift $g$ $\\rightarrow$ intensity $I_\\nu$ $\\rightarrow$ pixel.' },
+          { type: 'formula', name: 'Invariant Intensity (Liouville)', tex: 'I_{\\nu,\\mathrm{obs}} = g^3I_{\\nu,\\mathrm{emit}}', tag: 'Rendering', appliesTo: 'Ray tracing engines', assumptions: 'Photon number conservation' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'quasars_jets',
+    title: '16. Quasars, Relativistic Jets & High-Energy',
+    sections: [
+      {
+        title: 'Jet Kinematics & Mechanics',
+        items: [
+          { type: 'formula', name: 'Doppler Factor', tex: '\\delta= \\frac1{\\Gamma(1-\\beta\\cos\\theta)}', tag: 'Kinematics', appliesTo: 'Beamed emission', assumptions: 'Lorentz factor Gamma' },
+          { type: 'formula', name: 'Apparent Superluminal Velocity', tex: '\\beta_\\mathrm{app} = \\frac{\\beta\\sin\\theta}{1-\\beta\\cos\\theta}', tag: 'Kinematics', appliesTo: 'Jet observations', assumptions: 'Approaching flows' },
+          { type: 'text', content: 'Blandford-Znajek represents a theoretical GRMHD model for jet launching, relying on magnetic fields threading the Kerr horizon to extract rotational energy.' }
+        ]
+      },
+      {
+        title: 'Non-Thermal Emission',
+        items: [
+          { type: 'formula', name: 'Synchrotron Characteristic Frequency', tex: '\\nu_c = \\frac{3}{2}\\gamma^2 \\frac{eB\\sin\\alpha}{2\\pi m_e}', tag: 'Radiation', appliesTo: 'Relativistic electrons in B-field', assumptions: 'Ultra-relativistic regime' },
+          { type: 'formula', name: 'Synchrotron Power', tex: 'P_\\mathrm{syn} = \\frac{4}{3} \\sigma_Tc \\gamma^2 \\beta^2 U_B', tag: 'Radiation', appliesTo: 'Radiative losses', assumptions: 'Isotropic pitch angles' },
+          { type: 'formula', name: 'Inverse Compton Power', tex: 'P_\\mathrm{IC} = \\frac43\\sigma_Tc\\gamma^2\\beta^2U_\\mathrm{rad}', tag: 'Radiation', appliesTo: 'Photon upscattering', assumptions: 'Thomson regime limit' },
+          { type: 'formula', name: 'Pair Production Threshold', tex: 'E_1E_2(1-\\cos\\theta) \\ge 2(m_ec^2)^2', tag: 'QED', appliesTo: 'Gamma-ray attenuation', assumptions: 'Photon-photon collision' },
+          { type: 'formula', name: 'Optical Depth (Pair Prod)', tex: '\\tau_{\\gamma\\gamma} = \\int n_\\gamma\\sigma_{\\gamma\\gamma}\\,ds', tag: 'Transport', appliesTo: 'Gamma-ray escape', assumptions: 'High-energy environments' }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'gw',
+    title: '17. Gravitational Waves',
+    sections: [
+      {
+        title: 'Waveforms & Binaries',
+        items: [
+          { type: 'formula', name: 'Quadrupole Waveform', tex: 'h_{ij}^{TT} \\sim \\frac{2G}{c^4D} \\ddot Q_{ij}^{TT}', tag: 'Generation', appliesTo: 'Compact binaries', assumptions: 'Transverse-traceless gauge, far field' },
+          { type: 'formula', name: 'Chirp Mass', tex: '\\mathcal M = \\frac{(m_1m_2)^{3/5}}{(m_1+m_2)^{1/5}}', tag: 'Parameter', appliesTo: 'Inspiral phase', assumptions: 'Primary frequency driver' },
+          { type: 'formula', name: 'Frequency Evolution', tex: '\\dot f= \\frac{96}{5}\\pi^{8/3} \\left( \\frac{G\\mathcal M}{c^3} \\right)^{5/3} f^{11/3}', tag: 'Dynamics', appliesTo: 'Chirp signal', assumptions: 'Energy loss entirely to GWs' },
+          { type: 'formula', name: 'Orbital Energy', tex: 'E=-\\frac{Gm_1m_2}{2a}', tag: 'Dynamics', appliesTo: 'Binary systems', assumptions: 'Newtonian approximation for orbits' },
+          { type: 'formula', name: 'Inspiral Evolution', tex: '\\frac{da}{dt} = -\\frac{64}{5} \\frac{G^3\\mu M^2}{c^5a^3}', tag: 'Dynamics', appliesTo: 'Orbital decay', assumptions: 'Circular orbits, leading order' }
         ]
       }
     ]
   },
   {
     id: 'cosmology',
-    title: 'Cosmology',
+    title: '18. Cosmology',
     sections: [
       {
-        title: 'FLRW Spacetime & Universe Expansion',
+        title: 'Expansion Dynamics',
         items: [
-          { type: 'formula', name: 'FLRW Metric', tex: 'ds^2 = -c^2dt^2 + a(t)^2 \\left[ \\frac{dr^2}{1-kr^2} +r^2d\\Omega^2 \\right]', tag: 'Spacetime Metric', appliesTo: 'Expanding Universe', assumptions: 'Homogeneous, isotropic' },
-          { type: 'formula', name: 'Friedmann Equation', tex: 'H^2= \\frac{8\\pi G}{3}\\rho -\\frac{kc^2}{a^2} +\\frac{\\Lambda c^2}{3} \\quad \\left( H=\\frac{\\dot a}{a} \\right)', tag: 'Expansion Dynamics', appliesTo: 'FLRW Universe', assumptions: 'Derived from Einstein equations' },
-          { type: 'formula', name: 'Acceleration Equation', tex: '\\frac{\\ddot a}{a} = -\\frac{4\\pi G}{3} \\left( \\rho+\\frac{3P}{c^2} \\right) + \\frac{\\Lambda c^2}{3}', tag: 'Expansion Dynamics', appliesTo: 'Dark Energy / Matter balance', assumptions: 'FLRW Spacetime' },
-          { type: 'formula', name: 'Continuity Equation', tex: '\\dot\\rho + 3H \\left( \\rho+\\frac{P}{c^2} \\right) =0', tag: 'Conservation Law', appliesTo: 'Cosmic fluids', assumptions: 'Adiabatic expansion' },
-          { type: 'formula', name: 'Cosmic Equation of State Scaling', tex: 'P=w\\rho c^2 \\quad \\implies \\quad \\rho\\propto a^{-3(1+w)}', tag: 'Fluid Evolution', appliesTo: 'Matter (w=0), Rad (w=1/3), \\Lambda (w=-1)', assumptions: 'Constant w' }
+          { type: 'formula', name: 'FLRW Metric', tex: 'ds^2= -c^2dt^2+ a(t)^2 \\left[ \\frac{dr^2}{1-kr^2} +r^2d\\Omega^2 \\right]', tag: 'Spacetime', appliesTo: 'Expanding Universe', assumptions: 'Homogeneous, isotropic' },
+          { type: 'formula', name: 'Fluid Continuity Equation', tex: '\\dot\\rho+ 3H \\left( \\rho+\\frac{P}{c^2} \\right)=0', tag: 'Conservation', appliesTo: 'Cosmic fluids', assumptions: 'Adiabatic expansion' },
+          { type: 'formula', name: 'Equation of State', tex: 'P=w\\rho c^2', tag: 'EOS', appliesTo: 'Fluid classification', assumptions: 'Constant w per component' },
+          { type: 'formula', name: 'Density Scaling', tex: '\\rho\\propto a^{-3(1+w)}', tag: 'Evolution', appliesTo: 'Matter (w=0), Rad (w=1/3), Vacuum (w=-1)', assumptions: 'Derived from continuity' },
+          { type: 'formula', name: 'General Friedmann Equation', tex: 'H^2= H_0^2 [ \\Omega_r(1+z)^4+ \\Omega_m(1+z)^3+ \\Omega_k(1+z)^2+ \\Omega_\\Lambda ]', tag: 'Dynamics', appliesTo: 'Expansion history', assumptions: 'Standard LCDM' }
         ]
       },
       {
-        title: 'Cosmological Parameters & Distances',
+        title: 'Cosmological Distances',
         items: [
-          { type: 'formula', name: 'Critical Density & Density Parameters', tex: '\\rho_c= \\frac{3H^2}{8\\pi G} \\quad,\\quad \\Omega_i= \\frac{\\rho_i}{\\rho_c}', tag: 'Cosmological Parameters', appliesTo: 'Determining universe geometry', assumptions: 'Flat universe if \\Omega_tot = 1' },
-          { type: 'formula', name: 'Cosmological Closure Relation', tex: '\\Omega_\\mathrm{tot} = \\Omega_m+\\Omega_r+\\Omega_\\Lambda+\\Omega_k = 1', tag: 'Cosmological Parameters', appliesTo: 'Global geometry', assumptions: 'Defined at current epoch' },
-          { type: 'formula', name: 'Hubble Parameter Evolution', tex: 'H(z) = H_0 \\sqrt{ \\Omega_r(1+z)^4+ \\Omega_m(1+z)^3+ \\Omega_k(1+z)^2+ \\Omega_\\Lambda }', tag: 'Expansion History', appliesTo: 'Standard LCDM model', assumptions: 'Constant dark energy EOS' },
-          { type: 'formula', name: 'Lookback Time', tex: 't_L(z) = \\int_0^z \\frac{dz\'}{(1+z\')H(z\')}', tag: 'Cosmic Time', appliesTo: 'Age of observed objects', assumptions: 'Depends on H_0 and Omegas' },
-          { type: 'formula', name: 'Comoving Distance', tex: 'D_C= c\\int_0^z\\frac{dz\'}{H(z\')}', tag: 'Distance Measure', appliesTo: 'Large scale structure', assumptions: 'Expands with universe' },
-          { type: 'formula', name: 'Cosmological Redshift', tex: '1+z= \\frac{a_0}{a_\\mathrm{emit}} \\implies a_\\mathrm{emit}=\\frac{1}{1+z}', tag: 'Observable', appliesTo: 'Distant galaxies', assumptions: 'a_0 = 1 (current scale factor)' }
+          { type: 'formula', name: 'Comoving Distance', tex: 'D_C= c\\int_0^z\\frac{dz\'}{H(z\')}', tag: 'Distance', appliesTo: 'Coordinate distance', assumptions: 'Expands with universe' },
+          { type: 'formula', name: 'Lookback Time', tex: 't_L= \\int_0^z \\frac{dz\'}{(1+z\')H(z\')}', tag: 'Time', appliesTo: 'Age of observation', assumptions: 'Depends on cosmological parameters' },
+          { type: 'formula', name: 'Luminosity Distance', tex: 'D_L=(1+z)D_M', tag: 'Distance', appliesTo: 'Standard candles', assumptions: 'Flux dilution' },
+          { type: 'formula', name: 'Angular-Diameter Distance', tex: 'D_A=\\frac{D_M}{1+z}', tag: 'Distance', appliesTo: 'Standard rulers', assumptions: 'Apparent angular size' }
         ]
       }
     ]
   },
   {
-    id: 'qm_field',
-    title: 'Quantum Mechanics & QFT',
+    id: 'numerical',
+    title: '19. Mathematical & Numerical Methods',
     sections: [
       {
-        title: 'Core Quantum Mechanics',
+        title: 'Simulation Core',
         items: [
-          { type: 'formula', name: 'Schrödinger Equation', tex: 'i\\hbar \\frac{\\partial\\psi}{\\partial t} = \\hat H\\psi \\quad,\\quad \\hat H\\psi=E\\psi', tag: 'Wave Equation', appliesTo: 'Non-relativistic quantum systems', assumptions: 'Unitary evolution' },
-          { type: 'formula', name: 'Heisenberg Uncertainty Principle', tex: '\\Delta x\\,\\Delta p\\geq\\frac{\\hbar}{2} \\quad,\\quad \\Delta E\\,\\Delta t \\gtrsim\\frac{\\hbar}{2}', tag: 'Fundamental Limit', appliesTo: 'Conjugate variables', assumptions: 'Non-commuting operators' },
-          { type: 'formula', name: 'Planck Relations & Scales', tex: 'E=h\\nu \\quad,\\quad p=\\frac{h}{\\lambda} \\quad,\\quad l_P= \\sqrt{\\frac{\\hbar G}{c^3}}', tag: 'Quantum Thresholds', appliesTo: 'Photons, Quantum Gravity limits', assumptions: 'h-bar = h/2pi' },
-          { type: 'formula', name: 'Planck Mass & Time', tex: 't_P= \\sqrt{\\frac{\\hbar G}{c^5}} \\quad,\\quad m_P= \\sqrt{\\frac{\\hbar c}{G}} \\quad,\\quad E_P=m_Pc^2', tag: 'Quantum Thresholds', appliesTo: 'Big bang, Singularities', assumptions: 'G, c, hbar = 1' }
-        ]
-      },
-      {
-        title: 'Relativistic Quantum & QFT',
-        items: [
-          { type: 'formula', name: 'Dirac Equation', tex: '(i\\hbar c\\gamma^\\mu\\partial_\\mu-mc^2)\\psi=0', tag: 'Wave Equation', appliesTo: 'Spin-1/2 Fermions (electrons)', assumptions: 'Relativistic covariance' },
-          { type: 'formula', name: 'Klein-Gordon Equation', tex: '\\left( \\Box+\\frac{m^2c^2}{\\hbar^2} \\right)\\phi=0', tag: 'Wave Equation', appliesTo: 'Spin-0 Bosons (Higgs)', assumptions: 'Relativistic scalar field' },
-          { type: 'formula', name: 'QFT Action & Euler-Lagrange', tex: 'S=\\int\\mathcal L\\,d^4x \\implies \\frac{\\partial\\mathcal L}{\\partial\\phi} - \\partial_\\mu \\left( \\frac{\\partial\\mathcal L}{\\partial(\\partial_\\mu\\phi)} \\right) =0', tag: 'Stationary Action', appliesTo: 'All quantum fields', assumptions: 'Local field theory' }
+          { type: 'formula', name: 'First-Order ODE', tex: '\\frac{dy}{dx}=f(x,y)', tag: 'Math', appliesTo: 'Evolution equations', assumptions: 'Initial value problem' },
+          { type: 'formula', name: 'Runge-Kutta 4 (RK4) Step', tex: 'y_{n+1} = y_n+\\frac h6(k_1+2k_2+2k_3+k_4)', tag: 'Algorithm', appliesTo: 'Numerical integration', assumptions: '4th order accuracy' },
+          { type: 'formula', name: 'Ray Integration System', tex: '\\frac{dx^\\mu}{d\\lambda}=k^\\mu \\quad,\\quad \\frac{dk^\\mu}{d\\lambda} = -\\Gamma^\\mu_{\\alpha\\beta} k^\\alpha k^\\beta', tag: 'Algorithm', appliesTo: 'Geodesic renderers', assumptions: 'Coupled ODE system' },
+          { type: 'text', content: 'Simulation Verification: Every engine step must verify conservation tolerances for $\\Delta E$, $\\Delta L$, and the null condition $k_\\mu k^\\mu = 0$ for photons.' }
         ]
       }
     ]
   },
   {
-    id: 'engine_boundaries',
-    title: 'Simulation Boundaries',
+    id: 'validation',
+    title: '20. Physical Constants, Units & Validation',
     sections: [
       {
-        title: 'Engine Epistemology',
+        title: 'Framework Standards',
         items: [
-          { type: 'text', content: 'NOTE: This engine exclusively implements verified classical, relativistic, and standard-model quantum physics. It explicitly EXCLUDES speculative/hypothetical formulas such as:' },
-          { type: 'text', content: '- Loop Quantum Gravity discrete area/volume operators\n- String Theory multidimensional metric tensors\n- Hypothetical White Hole metrics (beyond conformal extensions)\n- Torsion-based modifications to General Relativity' }
+          { type: 'text', content: 'Base Constants: $G, c, \\hbar, k_B, e, m_e, m_p, M_\\odot, R_\\odot$' },
+          { type: 'text', content: 'Geometrized units ($G=c=1$) are utilized for internal GR calculations, but must explicitly transform back to SI/cgs for observable outputs.' },
+          { type: 'formula', name: 'Dimensional Analysis Requirement', tex: '[\\mathrm{LHS}] = [\\mathrm{RHS}]', tag: 'Validation', appliesTo: 'All formulated equations', assumptions: 'Engine strict typing' },
+          { type: 'text', content: 'Every formula in this database carries physical validity markers: EXACT, DERIVED, EXPERIMENTALLY VERIFIED, APPROXIMATION, SEMICLASSICAL, EMPIRICAL, MODEL-DEPENDENT, or MATHEMATICAL ONLY.' }
         ]
       }
     ]
@@ -607,7 +689,7 @@ const TheoryView = ({ activeChapterId, onSelectChapter }) => {
 // ==========================================================
 export default function AstrophysicsEngine() {
   const [appMode, setAppMode] = useState('THEORY');
-  const [activeChapterId, setActiveChapterId] = useState('gr');
+  const [activeChapterId, setActiveChapterId] = useState('classical');
   const [katexLoaded, setKatexLoaded] = useState(false);
 
   useEffect(() => {
