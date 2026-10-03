@@ -1,22 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 // ==========================================================
-// ASTROPHYSICAL DATA
-// ==========================================================
-const OBSERVED_MAGNETARS = [
-  { id: "sgr1806", name: "SGR 1806-20 (Extreme B-Field)", mass: 1.5, radius: 10.0, pSec: 7.5, pDotExp: 10.3 },
-  { id: "sgr1900", name: "SGR 1900+14", mass: 1.4, radius: 11.0, pSec: 5.2, pDotExp: 10.0 },
-  { id: "1e1547", name: "1E 1547.0-5408 (Fast Spinner)", mass: 1.4, radius: 12.0, pSec: 2.1, pDotExp: 10.6 },
-  { id: "custom", name: "Custom Configuration", mass: 1.4, radius: 12.0, pSec: 5.0, pDotExp: 11.0 }
-];
-
-// ==========================================================
 // STYLES & THEMES
 // ==========================================================
 const CSS_STYLES = `
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body, #root { width: 100vw; height: 100vh; overflow: hidden; background-color: #000; font-family: 'Courier New', Courier, monospace; color: white; }
-input[type=range], select, button { cursor: pointer; }
+input[type=range], button { cursor: pointer; }
 
 :root {
   --primary: #b366ff; --primary-soft: rgba(179, 102, 255, 0.35); --ink: #f2e6ff; --ink-muted: #ac8cd9;
@@ -76,13 +66,6 @@ input[type='range'] { width: 100%; -webkit-appearance: none; appearance: none; h
 input[type='range']::-webkit-slider-runnable-track { height: 3px; background: var(--line); border-radius: 2px; }
 input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; margin-top: -5.5px; border-radius: 50%; background: var(--primary); border: 0; box-shadow: 0 0 10px var(--primary); transition: transform 0.1s ease; }
 input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
-
-select {
-  width: 100%; padding: 6px; background: rgba(0,0,0,0.5); color: var(--ink);
-  border: 1px solid var(--line); border-radius: 4px; margin-bottom: 16px;
-  font-family: inherit; font-size: 12px;
-}
-select option { background: #000; }
 
 /* Responsive adjustments for mobile HUD */
 @media (max-width: 768px) {
@@ -303,12 +286,11 @@ export default function Magnetar() {
   const [isMobile, setIsMobile] = useState(false);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
 
-  // States
-  const [activeProfile, setActiveProfile] = useState(OBSERVED_MAGNETARS[0].id);
-  const [massMulti, setMassMulti] = useState(OBSERVED_MAGNETARS[0].mass); 
-  const [radiusKm, setRadiusKm] = useState(OBSERVED_MAGNETARS[0].radius); 
-  const [spinPeriodSec, setSpinPeriodSec] = useState(OBSERVED_MAGNETARS[0].pSec); 
-  const [pDotExp, setPDotExp] = useState(OBSERVED_MAGNETARS[0].pDotExp); 
+  // Default Magnetar States
+  const [massMulti, setMassMulti] = useState(1.5); 
+  const [radiusKm, setRadiusKm] = useState(10.0); 
+  const [spinPeriodSec, setSpinPeriodSec] = useState(7.5); 
+  const [pDotExp, setPDotExp] = useState(10.3); 
   
   // Camera Refs
   const aziRef = useRef(0.0);
@@ -343,23 +325,6 @@ export default function Magnetar() {
   const handlePointerUp = () => { draggingRef.current = false; };
   const handleWheel = (e) => { distRef.current = Math.max(5.0, Math.min(80.0, distRef.current + e.deltaY * 0.05)); };
   const resetCamera = () => { aziRef.current = 0.0; incRef.current = 1.25; distRef.current = 25.0; };
-
-  const handleProfileChange = (e) => {
-    const profileId = e.target.value;
-    setActiveProfile(profileId);
-    const profile = OBSERVED_MAGNETARS.find(s => s.id === profileId);
-    if (profile) {
-      setMassMulti(profile.mass);
-      setRadiusKm(profile.radius);
-      setSpinPeriodSec(profile.pSec);
-      setPDotExp(profile.pDotExp);
-    }
-  };
-
-  const handleCustomChange = (setter) => (e) => {
-    setter(parseFloat(e.target.value));
-    setActiveProfile('custom');
-  };
 
   const engineStateRef = useRef({ spinPeriodSec, physics: null });
 
@@ -499,10 +464,9 @@ export default function Magnetar() {
     try {
       const v2 = (v) => (v !== undefined && isFinite(v)) ? v.toFixed(3) : "∞";
       const vExp = (v) => (v !== undefined && isFinite(v) && v > 0) ? v.toExponential(2) : "0";
-      const currentProfile = OBSERVED_MAGNETARS.find(s => s.id === activeProfile) || OBSERVED_MAGNETARS[0];
 
       let text = `MAGNETAR PHYSICS ENGINE\n───────────────────────\n`;
-      text += `MODEL:            ${currentProfile.name}\n\n`;
+      text += `MODEL:            Magnetar Simulator\n\n`;
       
       text += `MASS              ${massMulti.toFixed(3)} M_sun\n`;
       text += `RADIUS            ${physics.radiusKm.toFixed(2)} km\n`;
@@ -531,34 +495,28 @@ export default function Magnetar() {
   // Shared Slider Control UI (to avoid duplication between PC/Mobile panels)
   const renderControls = () => (
     <>
-      <select value={activeProfile} onChange={handleProfileChange}>
-        {OBSERVED_MAGNETARS.map(star => (
-          <option key={star.id} value={star.id}>{star.name}</option>
-        ))}
-      </select>
-
       <div className="astro-row">
         <div className="astro-row-label"><span>Mass (M_sun)</span><span className="astro-value">{massMulti.toFixed(2)}</span></div>
-        <input type="range" min="1.0" max="2.5" step="0.01" value={massMulti} onChange={handleCustomChange(setMassMulti)} />
+        <input type="range" min="1.0" max="2.5" step="0.01" value={massMulti} onChange={(e) => setMassMulti(parseFloat(e.target.value))} />
       </div>
       
       <div className="astro-row">
         <div className="astro-row-label"><span>Radius (km)</span><span className="astro-value">{radiusKm.toFixed(2)}</span></div>
-        <input type="range" min="8.0" max="16.0" step="0.1" value={radiusKm} onChange={handleCustomChange(setRadiusKm)} />
+        <input type="range" min="8.0" max="16.0" step="0.1" value={radiusKm} onChange={(e) => setRadiusKm(parseFloat(e.target.value))} />
       </div>
 
       <div className="astro-row">
         <div className="astro-row-label"><span>Spin Period (s)</span><span className="astro-value">{spinPeriodSec.toFixed(2)}</span></div>
-        <input type="range" min="1.0" max="12.0" step="0.1" value={spinPeriodSec} onChange={handleCustomChange(setSpinPeriodSec)} />
+        <input type="range" min="1.0" max="12.0" step="0.1" value={spinPeriodSec} onChange={(e) => setSpinPeriodSec(parseFloat(e.target.value))} />
       </div>
 
       <div className="astro-row">
         <div className="astro-row-label"><span>Period Deriv (-log10 P_dot)</span><span className="astro-value">10^-{pDotExp.toFixed(1)}</span></div>
-        <input type="range" min="9.0" max="14.0" step="0.1" value={pDotExp} onChange={handleCustomChange(setPDotExp)} />
+        <input type="range" min="9.0" max="14.0" step="0.1" value={pDotExp} onChange={(e) => setPDotExp(parseFloat(e.target.value))} />
       </div>
 
       <div className="astro-info-box">
-        <strong>Magnetar Physics Framework:</strong> Models isolated neutron stars powered by enormous magnetic field decay. Calculates the inferred surface dipole (B_dip ≈ 3.2×10¹⁹ √(P P_dot)), checking if the field exceeds the Quantum Critical limit (B_Q). Outputs the theoretical proton cyclotron energy (E_cp ≈ 0.63(B/10¹⁴) keV) and maps it to the observed energy accounting for exact gravitational redshift (E_obs = E_emit / (1+z)) tested against SGR 1806−20 constraints.
+        <strong>Magnetar Physics Framework:</strong> Models isolated neutron stars powered by enormous magnetic field decay. Calculates the inferred surface dipole (B_dip ≈ 3.2×10¹⁹ √(P P_dot)), checking if the field exceeds the Quantum Critical limit (B_Q). Outputs the theoretical proton cyclotron energy (E_cp ≈ 0.63(B/10¹⁴) keV) and maps it to the observed energy accounting for exact gravitational redshift (E_obs = E_emit / (1+z)).
       </div>
     </>
   );
@@ -583,7 +541,7 @@ export default function Magnetar() {
       <button className="astro-toggle" onClick={() => setHudVisible(!hudVisible)} style={{ zIndex: 10 }}>TOGGLE HUD</button>
       
       {/* ========================================================== */}
-      {/* UI SWITCH: PC vs MOBILE                                      */}
+      {/* UI SWITCH: PC vs MOBILE                                    */}
       {/* ========================================================== */}
       
       {!isMobile ? (
