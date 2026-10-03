@@ -23,6 +23,7 @@ input[type=range], button { cursor: pointer; }
 .astro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
 .astro-canvas:active { cursor: grabbing; }
 
+/* --- PC PANEL (Untouched) --- */
 .astro-panel {
   position: absolute; right: 12px; bottom: 12px; width: min(460px, calc(100% - 24px)); max-height: calc(100% - 70px);
   overflow-y: auto; padding: 16px 20px; font-size: 12.5px; line-height: 1.5; background: var(--panel);
@@ -33,6 +34,29 @@ input[type=range], button { cursor: pointer; }
 .astro-panel::-webkit-scrollbar { width: 6px; }
 .astro-panel::-webkit-scrollbar-track { background: transparent; }
 .astro-panel::-webkit-scrollbar-thumb { background-color: var(--primary-soft); border-radius: 4px; }
+
+/* --- MOBILE SPECIFIC CSS --- */
+.astro-panel-mobile {
+  position: absolute; bottom: 0; left: 0; width: 100%; max-height: 85vh;
+  background: var(--panel); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-top: 1px solid var(--primary-soft); border-radius: 20px 20px 0 0;
+  padding: 24px 20px; font-size: 12.5px; overflow-y: auto;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 20;
+}
+.astro-panel-mobile.closed { transform: translateY(100%); }
+.astro-panel-mobile.open { transform: translateY(0); box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.7); }
+
+.mobile-open-btn {
+  position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+  padding: 12px 24px; background: rgba(8, 6, 4, 0.6); border: 1px solid var(--primary);
+  color: var(--primary); border-radius: 30px; font-weight: bold; font-size: 12px;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); z-index: 10;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5); letter-spacing: 0.05em;
+}
+.mobile-close-btn {
+  position: absolute; top: 20px; right: 20px; background: transparent; border: none;
+  color: var(--primary); font-size: 20px; font-weight: bold; padding: 4px;
+}
 
 .astro-title { margin: 0 0 2px; font-size: 16px; font-weight: 700; letter-spacing: 0.02em; }
 .astro-sub { margin: 0 0 16px; font-size: 11.5px; color: var(--ink-muted); }
@@ -46,6 +70,11 @@ input[type='range'] { width: 100%; -webkit-appearance: none; appearance: none; h
 input[type='range']::-webkit-slider-runnable-track { height: 3px; background: var(--line); border-radius: 2px; }
 input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; margin-top: -5.5px; border-radius: 50%; background: var(--primary); border: 0; box-shadow: 0 0 10px var(--primary); transition: transform 0.1s ease; }
 input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+/* Responsive adjustments for mobile HUD */
+@media (max-width: 768px) {
+  .astro-hud { font-size: 9px !important; top: 50px !important; }
+}
 `;
 
 // ==========================================================
@@ -145,8 +174,8 @@ export class DwarfPhysics {
 // ==========================================================
 const getDwarfColor = (temp) => {
   const stops = [
-    { t: 1000, c: [255, 15, 0] },     
-    { t: 3000, c: [255, 100, 0] },    
+    { t: 1000, c: [255, 15, 0] },    
+    { t: 3000, c: [255, 100, 0] },   
     { t: 5800, c: [255, 230, 190] },  
     { t: 10000, c: [210, 225, 255] }, 
     { t: 30000, c: [60, 110, 255] }   
@@ -268,6 +297,10 @@ export default function DwarfStar() {
   const [hudVisible, setHudVisible] = useState(true);
   const [sysError, setSysError] = useState(null);
   
+  // Responsive States
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
+
   const [massMulti, setMassMulti] = useState(1.0); 
   const [starTemp, setStarTemp] = useState(15000);
   const [spin, setSpin] = useState(0.05); 
@@ -279,6 +312,14 @@ export default function DwarfStar() {
   const draggingRef = useRef(false);
   const lastXRef = useRef(0);
   const lastYRef = useRef(0);
+
+  // Responsive Mount Effect
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    handleResize(); // Initial check
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handlePointerDown = (e) => {
     draggingRef.current = true;
@@ -463,6 +504,33 @@ export default function DwarfStar() {
     } catch (e) { return `HUD UI Error:\n${e.message}`; }
   };
 
+  // Shared Slider Control UI (to avoid duplication between PC/Mobile panels)
+  const renderControls = () => (
+    <>
+      <div className="astro-row">
+        <div className="astro-row-label"><span>Mass (M_sun)</span><span className="astro-value">{massMulti.toFixed(2)}</span></div>
+        <input type="range" min="0.1" max="1.44" step="0.01" value={massMulti} onChange={e => setMassMulti(parseFloat(e.target.value))} />
+      </div>
+      
+      <div className="astro-row">
+        <div className="astro-row-label"><span>Effective Temperature (K)</span><span className="astro-value">{starTemp} K</span></div>
+        <input type="range" min="1000" max="30000" step="100" value={starTemp} onChange={e => setStarTemp(parseInt(e.target.value))} />
+      </div>
+
+      <div className="astro-row">
+        <div className="astro-row-label"><span>Core Composition</span><span className="astro-value">{composition}</span></div>
+        <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+          <button onClick={() => setComposition('He')} style={{ flex: 1, padding: '4px', background: composition==='He' ? 'var(--primary)' : 'transparent', color: composition==='He' ? '#000' : 'var(--ink)', border: '1px solid var(--primary)', borderRadius: '4px' }}>Helium</button>
+          <button onClick={() => setComposition('CO')} style={{ flex: 1, padding: '4px', background: composition==='CO' ? 'var(--primary)' : 'transparent', color: composition==='CO' ? '#000' : 'var(--ink)', border: '1px solid var(--primary)', borderRadius: '4px' }}>Carbon-Oxygen</button>
+        </div>
+      </div>
+
+      <div className="astro-info-box">
+        <strong>Physics Models:</strong> Computes the exact ultra-relativistic electron degeneracy Fermi pressure equation of state. Because of electron degeneracy pressure, notice the <strong>inverse mass-radius relation</strong>: as you increase the mass, the star visually and physically shrinks until it nears the Chandrasekhar limit (1.44 $M_\odot$).
+      </div>
+    </>
+  );
+
   return (
     <div className={`astro-root ${currentTheme}`}>
       <style>{CSS_STYLES}</style>
@@ -475,44 +543,53 @@ export default function DwarfStar() {
       />
       
       {hudVisible && (
-        <div style={{ position: 'absolute', top: 16, left: 16, textShadow: '0 1px 2px #000', fontSize: '11px', pointerEvents: 'none', lineHeight: 1.5, zIndex: 10, whiteSpace: 'pre', fontFamily: 'monospace', color: 'var(--primary)' }}>
+        <div className="astro-hud" style={{ position: 'absolute', top: 16, left: 16, textShadow: '0 1px 2px #000', fontSize: '11px', pointerEvents: 'none', lineHeight: 1.5, zIndex: 10, whiteSpace: 'pre', fontFamily: 'monospace', color: 'var(--primary)' }}>
           {physics ? renderHUDText() : "Loading Physics Engine..."}
         </div>
       )}
       
       <button className="astro-toggle" onClick={() => setHudVisible(!hudVisible)} style={{ zIndex: 10 }}>TOGGLE HUD</button>
       
-      <div className="astro-panel">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-          <div>
-            <h3 className="astro-title">White Dwarf Simulator</h3>
-            <p className="astro-sub" style={{ margin: 0 }}>Drag: Rotate | Scroll: Zoom | DblClick: Reset</p>
+      {/* ========================================================== */}
+      {/* UI SWITCH: PC vs MOBILE                                      */}
+      {/* ========================================================== */}
+      
+      {!isMobile ? (
+        /* --- EXACT ORIGINAL PC PANEL SECTION --- */
+        <div className="astro-panel">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <div>
+              <h3 className="astro-title">White Dwarf Simulator</h3>
+              <p className="astro-sub" style={{ margin: 0 }}>Drag: Rotate | Scroll: Zoom | DblClick: Reset</p>
+            </div>
+            <button onClick={resetCamera} style={{ fontSize: '10px', padding: '4px 8px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', cursor: 'pointer' }}>RESET VIEW</button>
           </div>
-          <button onClick={resetCamera} style={{ fontSize: '10px', padding: '4px 8px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', cursor: 'pointer' }}>RESET VIEW</button>
+          {renderControls()}
         </div>
+      ) : (
+        /* --- NEW DEDICATED MOBILE SECTION --- */
+        <>
+          {!mobilePanelOpen && (
+            <button className="mobile-open-btn" onClick={() => setMobilePanelOpen(true)}>
+              ⚙️ Adjust White Dwarf Physics
+            </button>
+          )}
 
-        <div className="astro-row">
-          <div className="astro-row-label"><span>Mass (M_sun)</span><span className="astro-value">{massMulti.toFixed(2)}</span></div>
-          <input type="range" min="0.1" max="1.44" step="0.01" value={massMulti} onChange={e => setMassMulti(parseFloat(e.target.value))} />
-        </div>
-        
-        <div className="astro-row">
-          <div className="astro-row-label"><span>Effective Temperature (K)</span><span className="astro-value">{starTemp} K</span></div>
-          <input type="range" min="1000" max="30000" step="100" value={starTemp} onChange={e => setStarTemp(parseInt(e.target.value))} />
-        </div>
-
-        <div className="astro-row">
-          <div className="astro-row-label"><span>Core Composition</span><span className="astro-value">{composition}</span></div>
-          <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-            <button onClick={() => setComposition('He')} style={{ flex: 1, padding: '4px', background: composition==='He' ? 'var(--primary)' : 'transparent', color: composition==='He' ? '#000' : 'var(--ink)', border: '1px solid var(--primary)', borderRadius: '4px' }}>Helium</button>
-            <button onClick={() => setComposition('CO')} style={{ flex: 1, padding: '4px', background: composition==='CO' ? 'var(--primary)' : 'transparent', color: composition==='CO' ? '#000' : 'var(--ink)', border: '1px solid var(--primary)', borderRadius: '4px' }}>Carbon-Oxygen</button>
+          <div className={`astro-panel-mobile ${mobilePanelOpen ? 'open' : 'closed'}`}>
+            <button className="mobile-close-btn" onClick={() => setMobilePanelOpen(false)}>✕</button>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingRight: '24px' }}>
+              <div>
+                <h3 className="astro-title">White Dwarf Simulator</h3>
+                <p className="astro-sub" style={{ margin: 0 }}>Swipe: Rotate | Pinch: Zoom</p>
+              </div>
+              <button onClick={resetCamera} style={{ fontSize: '10px', padding: '6px 10px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', borderRadius: '4px' }}>RESET</button>
+            </div>
+            
+            {renderControls()}
           </div>
-        </div>
-
-        <div className="astro-info-box">
-          <strong>Physics Models:</strong> Computes the exact ultra-relativistic electron degeneracy Fermi pressure equation of state. Because of electron degeneracy pressure, notice the <strong>inverse mass-radius relation</strong>: as you increase the mass, the star visually and physically shrinks until it nears the Chandrasekhar limit (1.44 $M_\odot$).
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

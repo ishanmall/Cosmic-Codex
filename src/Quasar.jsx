@@ -19,6 +19,7 @@ input[type=range], button { cursor: pointer; }
 .astro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
 .astro-canvas:active { cursor: grabbing; }
 
+/* --- PC PANEL (Untouched) --- */
 .astro-panel {
   position: absolute; right: 12px; bottom: 12px; width: min(320px, calc(100% - 24px)); max-height: calc(100% - 70px);
   overflow-y: auto; padding: 16px 20px; font-size: 12px; line-height: 1.5; background: var(--panel);
@@ -29,6 +30,29 @@ input[type=range], button { cursor: pointer; }
 .astro-panel::-webkit-scrollbar { width: 6px; }
 .astro-panel::-webkit-scrollbar-track { background: transparent; }
 .astro-panel::-webkit-scrollbar-thumb { background-color: var(--primary-soft); border-radius: 4px; }
+
+/* --- MOBILE SPECIFIC CSS --- */
+.astro-panel-mobile {
+  position: absolute; bottom: 0; left: 0; width: 100%; max-height: 85vh;
+  background: var(--panel); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-top: 1px solid var(--primary-soft); border-radius: 20px 20px 0 0;
+  padding: 24px 20px; font-size: 12px; overflow-y: auto;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 20;
+}
+.astro-panel-mobile.closed { transform: translateY(100%); }
+.astro-panel-mobile.open { transform: translateY(0); box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.7); }
+
+.mobile-open-btn {
+  position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+  padding: 12px 24px; background: rgba(12, 10, 6, 0.6); border: 1px solid var(--primary);
+  color: var(--primary); border-radius: 30px; font-weight: bold; font-size: 12px;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); z-index: 10;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5); letter-spacing: 0.05em;
+}
+.mobile-close-btn {
+  position: absolute; top: 20px; right: 20px; background: transparent; border: none;
+  color: var(--primary); font-size: 20px; font-weight: bold; padding: 4px;
+}
 
 .astro-title { margin: 0 0 2px; font-size: 15px; font-weight: 700; letter-spacing: 0.02em; }
 .astro-sub { margin: 0 0 16px; font-size: 11px; color: var(--ink-muted); }
@@ -42,20 +66,19 @@ input[type='range'] { width: 100%; -webkit-appearance: none; appearance: none; h
 input[type='range']::-webkit-slider-runnable-track { height: 3px; background: var(--line); border-radius: 2px; }
 input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; margin-top: -5.5px; border-radius: 50%; background: var(--primary); border: 0; box-shadow: 0 0 10px var(--primary); transition: transform 0.1s ease; }
 input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+/* Responsive adjustments for mobile HUD */
+@media (max-width: 768px) {
+  .astro-hud { font-size: 9px !important; top: 50px !important; }
+}
 `;
 
 // ==========================================================
 // PHYSICS ENGINE (Kerr Math & Quasar AGN Physics)
 // ==========================================================
 export const CONSTANTS = {
-  G: 6.67430e-11,
-  c: 299792458,
-  h: 6.62607015e-34,
-  k_B: 1.380649e-23,
-  m_p: 1.6726219e-27,
-  M_sun: 1.98847e30,
-  sigma_T: 6.65245873e-29,
-  yr_to_s: 3.154e7
+  G: 6.67430e-11, c: 299792458, h: 6.62607015e-34, k_B: 1.380649e-23, m_p: 1.6726219e-27,
+  M_sun: 1.98847e30, sigma_T: 6.65245873e-29, yr_to_s: 3.154e7
 };
 
 export class KerrPhysics {
@@ -80,20 +103,13 @@ export class QuasarPhysics {
   static getEddingtonLuminosity(massKg) { 
     return (4 * Math.PI * CONSTANTS.G * massKg * CONSTANTS.m_p * CONSTANTS.c) / CONSTANTS.sigma_T; 
   }
-  
-  static getAccretionRate(L_bol, efficiency) { 
-    return L_bol / (efficiency * CONSTANTS.c**2); 
-  }
-  
+  static getAccretionRate(L_bol, efficiency) { return L_bol / (efficiency * CONSTANTS.c**2); }
   static getBroadLineRegionRadius(L_bol) {
     const L_erg = L_bol * 1e7;
     const R_lightdays = 32.9 * Math.pow(L_erg / 1e44, 0.5);
     return R_lightdays * 2.59e13; 
   }
-
-  static getJetVelocity(lorentzFactor) { 
-    return CONSTANTS.c * Math.sqrt(1 - 1/(lorentzFactor**2)); 
-  }
+  static getJetVelocity(lorentzFactor) { return CONSTANTS.c * Math.sqrt(1 - 1/(lorentzFactor**2)); }
 }
 
 // ==========================================================
@@ -164,15 +180,15 @@ float fbm(vec3 p) {
 }
 
 vec3 getQuasarDiskColor(float temp) {
-    vec3 c0 = vec3(0.090, 0.063, 0.055); // #17100E Outer
-    vec3 c1 = vec3(0.196, 0.090, 0.075); // #321713 
-    vec3 c2 = vec3(0.353, 0.145, 0.094); // #5A2518 Middle
-    vec3 c3 = vec3(0.620, 0.247, 0.125); // #9E3F20
-    vec3 c4 = vec3(0.847, 0.400, 0.141); // #D86624 
-    vec3 c5 = vec3(1.000, 0.604, 0.196); // #FF9A32 Inner
-    vec3 c6 = vec3(1.000, 0.827, 0.416); // #FFD36A 
-    vec3 c7 = vec3(1.000, 0.957, 0.816); // #FFF4D0 
-    vec3 c8 = vec3(1.000, 1.000, 1.000); // #FFFFFF 
+    vec3 c0 = vec3(0.090, 0.063, 0.055);
+    vec3 c1 = vec3(0.196, 0.090, 0.075);
+    vec3 c2 = vec3(0.353, 0.145, 0.094);
+    vec3 c3 = vec3(0.620, 0.247, 0.125);
+    vec3 c4 = vec3(0.847, 0.400, 0.141);
+    vec3 c5 = vec3(1.000, 0.604, 0.196);
+    vec3 c6 = vec3(1.000, 0.827, 0.416);
+    vec3 c7 = vec3(1.000, 0.957, 0.816);
+    vec3 c8 = vec3(1.000, 1.000, 1.000);
     
     float t = clamp(temp, 0.0, 1.0) * 8.0;
     int i = int(floor(t));
@@ -252,7 +268,7 @@ void main() {
                     float jetBoost = max(0.12, pow(clamp(dopplerJet, 0.15, 10.0), 3.0));
                     
                     vec3 coreColor = vec3(1.0, 1.0, 1.0);
-                    vec3 innerGlow = vec3(0.55, 0.79, 1.0); // #8EC9FF
+                    vec3 innerGlow = vec3(0.55, 0.79, 1.0);
                     vec3 haloColor = vec3(0.02, 0.15, 0.35); 
                     
                     vec3 jCol = mix(haloColor, innerGlow, smoothstep(0.02, 0.3, radialFalloff));
@@ -345,6 +361,10 @@ export default function Quasar() {
   const [hudVisible, setHudVisible] = useState(true);
   const [sysError, setSysError] = useState(null);
   
+  // Responsive State
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
+
   const [logMass, setLogMass] = useState(8.5); 
   const [spin, setSpin] = useState(0.99);
   const [eddRatio, setEddRatio] = useState(0.8); 
@@ -356,6 +376,14 @@ export default function Quasar() {
   const draggingRef = useRef(false);
   const lastXRef = useRef(0);
   const lastYRef = useRef(0);
+
+  useEffect(() => {
+    // Media query to detect mobile screen sizes seamlessly
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handlePointerDown = (e) => {
     draggingRef.current = true;
@@ -523,6 +551,31 @@ export default function Quasar() {
     } catch (e) { return `HUD UI Error:\n${e.message}`; }
   };
 
+  // Shared Slider Control UI (to avoid duplication between PC/Mobile panels)
+  const renderControls = () => (
+    <>
+      <div className="astro-row">
+        <div className="astro-row-label"><span>SMBH Mass (Log10 M_sun)</span><span className="astro-value">10^{logMass.toFixed(2)}</span></div>
+        <input type="range" min="6.0" max="10.5" step="0.05" value={logMass} onChange={e => setLogMass(parseFloat(e.target.value))} />
+      </div>
+      <div className="astro-row">
+        <div className="astro-row-label"><span>Spin (a*)</span><span className="astro-value">{spin.toFixed(3)}</span></div>
+        <input type="range" min="0" max="0.999" step="0.001" value={spin} onChange={e => setSpin(parseFloat(e.target.value))} />
+      </div>
+      <div className="astro-row">
+        <div className="astro-row-label"><span>Eddington Ratio (λ)</span><span className="astro-value">{eddRatio.toFixed(2)}</span></div>
+        <input type="range" min="0.01" max="1.5" step="0.01" value={eddRatio} onChange={e => setEddRatio(parseFloat(e.target.value))} />
+      </div>
+      <div className="astro-row">
+        <div className="astro-row-label"><span>Jet Lorentz Factor (Γ)</span><span className="astro-value">{lorentzFactor.toFixed(1)}</span></div>
+        <input type="range" min="2.0" max="50.0" step="1.0" value={lorentzFactor} onChange={e => setLorentzFactor(parseFloat(e.target.value))} />
+      </div>
+      <div className="astro-info-box">
+        <strong>Cinematic Quasar Engine:</strong> The Lorentz factor geometrically dictates the relativistic jet's opening angle and Doppler beaming. The Eddington ratio controls accretion luminosity and thermal volumetric density mapping precisely to the requested hex palette.
+      </div>
+    </>
+  );
+
   return (
     <div className="astro-root theme-quasar">
       <style>{CSS_STYLES}</style>
@@ -535,46 +588,55 @@ export default function Quasar() {
       />
       
       {hudVisible && (
-        <div style={{ position: 'absolute', top: 16, left: 16, textShadow: '0 1px 2px #000', fontSize: '11px', pointerEvents: 'none', lineHeight: 1.5, zIndex: 10, whiteSpace: 'pre', fontFamily: 'monospace', color: 'var(--primary)' }}>
+        <div className="astro-hud" style={{ position: 'absolute', top: 16, left: 16, textShadow: '0 1px 2px #000', fontSize: '11px', pointerEvents: 'none', lineHeight: 1.5, zIndex: 10, whiteSpace: 'pre', fontFamily: 'monospace', color: 'var(--primary)' }}>
           {physics ? renderHUDText() : "Loading Physics Engine..."}
         </div>
       )}
       
       <button className="astro-toggle" onClick={() => setHudVisible(!hudVisible)} style={{ zIndex: 10 }}>TOGGLE HUD</button>
       
-      <div className="astro-panel">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-          <div>
-            <h3 className="astro-title">Quasar Simulator</h3>
-            <p className="astro-sub" style={{ margin: 0 }}>Drag: Rotate | Scroll: Zoom</p>
+      {/* ========================================================== */}
+      {/* UI SWITCH: PC vs MOBILE                                      */}
+      {/* ========================================================== */}
+      
+      {!isMobile ? (
+        /* --- EXACT ORIGINAL PC PANEL SECTION --- */
+        <div className="astro-panel">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <div>
+              <h3 className="astro-title">Quasar Simulator</h3>
+              <p className="astro-sub" style={{ margin: 0 }}>Drag: Rotate | Scroll: Zoom</p>
+            </div>
+            <button onClick={resetCamera} style={{ fontSize: '10px', padding: '4px 8px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', cursor: 'pointer' }}>RESET</button>
           </div>
-          <button onClick={resetCamera} style={{ fontSize: '10px', padding: '4px 8px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', cursor: 'pointer' }}>RESET</button>
+          {renderControls()}
         </div>
+      ) : (
+        /* --- NEW DEDICATED MOBILE SECTION --- */
+        <>
+          {/* Unobtrusive open button that stays at the bottom */}
+          {!mobilePanelOpen && (
+            <button className="mobile-open-btn" onClick={() => setMobilePanelOpen(true)}>
+              ⚙️ Adjust Physics Engine
+            </button>
+          )}
 
-        <div className="astro-row">
-          <div className="astro-row-label"><span>SMBH Mass (Log10 M_sun)</span><span className="astro-value">10^{logMass.toFixed(2)}</span></div>
-          <input type="range" min="6.0" max="10.5" step="0.05" value={logMass} onChange={e => setLogMass(parseFloat(e.target.value))} />
-        </div>
-        
-        <div className="astro-row">
-          <div className="astro-row-label"><span>Spin (a*)</span><span className="astro-value">{spin.toFixed(3)}</span></div>
-          <input type="range" min="0" max="0.999" step="0.001" value={spin} onChange={e => setSpin(parseFloat(e.target.value))} />
-        </div>
-
-        <div className="astro-row">
-          <div className="astro-row-label"><span>Eddington Ratio (λ)</span><span className="astro-value">{eddRatio.toFixed(2)}</span></div>
-          <input type="range" min="0.01" max="1.5" step="0.01" value={eddRatio} onChange={e => setEddRatio(parseFloat(e.target.value))} />
-        </div>
-
-        <div className="astro-row">
-          <div className="astro-row-label"><span>Jet Lorentz Factor (Γ)</span><span className="astro-value">{lorentzFactor.toFixed(1)}</span></div>
-          <input type="range" min="2.0" max="50.0" step="1.0" value={lorentzFactor} onChange={e => setLorentzFactor(parseFloat(e.target.value))} />
-        </div>
-
-        <div className="astro-info-box">
-          <strong>Cinematic Quasar Engine:</strong> The Lorentz factor geometrically dictates the relativistic jet's opening angle and Doppler beaming. The Eddington ratio controls accretion luminosity and thermal volumetric density mapping precisely to the requested hex palette.
-        </div>
-      </div>
+          {/* Bottom Sheet Drawer for sliders */}
+          <div className={`astro-panel-mobile ${mobilePanelOpen ? 'open' : 'closed'}`}>
+            <button className="mobile-close-btn" onClick={() => setMobilePanelOpen(false)}>✕</button>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingRight: '24px' }}>
+              <div>
+                <h3 className="astro-title">Quasar Simulator</h3>
+                <p className="astro-sub" style={{ margin: 0 }}>Swipe: Rotate | Pinch: Zoom</p>
+              </div>
+              <button onClick={resetCamera} style={{ fontSize: '10px', padding: '6px 10px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', borderRadius: '4px' }}>RESET</button>
+            </div>
+            
+            {renderControls()}
+          </div>
+        </>
+      )}
     </div>
   );
 }

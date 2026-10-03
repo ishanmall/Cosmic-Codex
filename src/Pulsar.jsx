@@ -29,6 +29,7 @@ input[type=range], select, button { cursor: pointer; }
 .astro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
 .astro-canvas:active { cursor: grabbing; }
 
+/* --- PC PANEL (Untouched) --- */
 .astro-panel {
   position: absolute; right: 12px; bottom: 12px; width: min(440px, calc(100% - 24px)); max-height: calc(100% - 70px);
   overflow-y: auto; padding: 16px 20px; font-size: 12.5px; line-height: 1.5; background: var(--panel);
@@ -39,6 +40,29 @@ input[type=range], select, button { cursor: pointer; }
 .astro-panel::-webkit-scrollbar { width: 6px; }
 .astro-panel::-webkit-scrollbar-track { background: transparent; }
 .astro-panel::-webkit-scrollbar-thumb { background-color: var(--primary-soft); border-radius: 4px; }
+
+/* --- MOBILE SPECIFIC CSS --- */
+.astro-panel-mobile {
+  position: absolute; bottom: 0; left: 0; width: 100%; max-height: 85vh;
+  background: var(--panel); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-top: 1px solid var(--primary-soft); border-radius: 20px 20px 0 0;
+  padding: 24px 20px; font-size: 12.5px; overflow-y: auto;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 20;
+}
+.astro-panel-mobile.closed { transform: translateY(100%); }
+.astro-panel-mobile.open { transform: translateY(0); box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.7); }
+
+.mobile-open-btn {
+  position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+  padding: 12px 24px; background: rgba(2, 10, 14, 0.6); border: 1px solid var(--primary);
+  color: var(--primary); border-radius: 30px; font-weight: bold; font-size: 12px;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); z-index: 10;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5); letter-spacing: 0.05em;
+}
+.mobile-close-btn {
+  position: absolute; top: 20px; right: 20px; background: transparent; border: none;
+  color: var(--primary); font-size: 20px; font-weight: bold; padding: 4px;
+}
 
 .astro-title { margin: 0 0 2px; font-size: 16px; font-weight: 700; letter-spacing: 0.02em; }
 .astro-sub { margin: 0 0 16px; font-size: 11.5px; color: var(--ink-muted); }
@@ -59,6 +83,11 @@ select {
   font-family: inherit; font-size: 12px;
 }
 select option { background: #000; }
+
+/* Responsive adjustments for mobile HUD */
+@media (max-width: 768px) {
+  .astro-hud { font-size: 9px !important; top: 50px !important; }
+}
 `;
 
 // ==========================================================
@@ -248,6 +277,10 @@ export default function Pulsar() {
   const [hudVisible, setHudVisible] = useState(true);
   const [sysError, setSysError] = useState(null);
   
+  // Responsive States
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
+
   // States
   const [activeProfile, setActiveProfile] = useState(OBSERVED_PULSARS[0].id);
   const [massMulti, setMassMulti] = useState(OBSERVED_PULSARS[0].mass); 
@@ -263,6 +296,14 @@ export default function Pulsar() {
   const draggingRef = useRef(false);
   const lastXRef = useRef(0);
   const lastYRef = useRef(0);
+
+  // Responsive Mount Effect
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    handleResize(); // Initial check
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handlePointerDown = (e) => {
     draggingRef.current = true;
@@ -466,6 +507,46 @@ export default function Pulsar() {
     } catch (e) { return `HUD UI Error:\n${e.message}`; }
   };
 
+  // Shared Slider Control UI (to avoid duplication between PC/Mobile panels)
+  const renderControls = () => (
+    <>
+      <select value={activeProfile} onChange={handleProfileChange}>
+        {OBSERVED_PULSARS.map(star => (
+          <option key={star.id} value={star.id}>{star.name}</option>
+        ))}
+      </select>
+
+      <div className="astro-row">
+        <div className="astro-row-label"><span>Mass (M_sun)</span><span className="astro-value">{massMulti.toFixed(2)}</span></div>
+        <input type="range" min="1.0" max="2.5" step="0.01" value={massMulti} onChange={handleCustomChange(setMassMulti)} />
+      </div>
+      
+      <div className="astro-row">
+        <div className="astro-row-label"><span>Radius (km)</span><span className="astro-value">{radiusKm.toFixed(2)}</span></div>
+        <input type="range" min="8.0" max="16.0" step="0.1" value={radiusKm} onChange={handleCustomChange(setRadiusKm)} />
+      </div>
+
+      <div className="astro-row">
+        <div className="astro-row-label"><span>Spin Period (ms)</span><span className="astro-value">{spinPeriodMs.toFixed(2)}</span></div>
+        <input type="range" min="1.0" max="1000.0" step="0.1" value={spinPeriodMs} onChange={handleCustomChange(setSpinPeriodMs)} />
+      </div>
+
+      <div className="astro-row">
+        <div className="astro-row-label"><span>Period Deriv (-log10 P_dot)</span><span className="astro-value">10^-{pDotExp.toFixed(1)}</span></div>
+        <input type="range" min="10.0" max="22.0" step="0.1" value={pDotExp} onChange={handleCustomChange(setPDotExp)} />
+      </div>
+
+      <div className="astro-row">
+        <div className="astro-row-label"><span>Magnetic Inclination (α)</span><span className="astro-value">{beamAngle.toFixed(1)}°</span></div>
+        <input type="range" min="0.0" max="90.0" step="1.0" value={beamAngle} onChange={handleCustomChange(setBeamAngle)} />
+      </div>
+
+      <div className="astro-info-box">
+        <strong>Pulsar Physics Framework:</strong> Models a rapid rotating neutron star losing energy via dipole braking. Calculates Spin-Down Luminosity (E_dot = 4π²I P_dot / P³), Characteristic Age (τ_c = P / 2P_dot), and inferred dipole field (B_s = 3.2×10¹⁹ √(P P_dot)). Includes accurate light-cylinder scaling (R_LC = c/Ω) mapping observational timing parameters from the NASA/ATNF catalog directly into the physical model.
+      </div>
+    </>
+  );
+
   return (
     <div className="astro-root theme-pulsar">
       <style>{CSS_STYLES}</style>
@@ -478,57 +559,53 @@ export default function Pulsar() {
       />
       
       {hudVisible && (
-        <div style={{ position: 'absolute', top: 16, left: 16, textShadow: '0 1px 2px #000', fontSize: '11px', pointerEvents: 'none', lineHeight: 1.5, zIndex: 10, whiteSpace: 'pre', fontFamily: 'monospace', color: 'var(--primary)' }}>
+        <div className="astro-hud" style={{ position: 'absolute', top: 16, left: 16, textShadow: '0 1px 2px #000', fontSize: '11px', pointerEvents: 'none', lineHeight: 1.5, zIndex: 10, whiteSpace: 'pre', fontFamily: 'monospace', color: 'var(--primary)' }}>
           {physics ? renderHUDText() : "Loading Physics Engine..."}
         </div>
       )}
       
       <button className="astro-toggle" onClick={() => setHudVisible(!hudVisible)} style={{ zIndex: 10 }}>TOGGLE HUD</button>
       
-      <div className="astro-panel">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-          <div>
-            <h3 className="astro-title">Pulsar Simulator</h3>
-            <p className="astro-sub" style={{ margin: 0 }}>Drag: Rotate | Scroll: Zoom | DblClick: Reset</p>
+      {/* ========================================================== */}
+      {/* UI SWITCH: PC vs MOBILE                                      */}
+      {/* ========================================================== */}
+      
+      {!isMobile ? (
+        /* --- EXACT ORIGINAL PC PANEL SECTION --- */
+        <div className="astro-panel">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <div>
+              <h3 className="astro-title">Pulsar Simulator</h3>
+              <p className="astro-sub" style={{ margin: 0 }}>Drag: Rotate | Scroll: Zoom | DblClick: Reset</p>
+            </div>
+            <button onClick={resetCamera} style={{ fontSize: '10px', padding: '4px 8px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', cursor: 'pointer' }}>RESET VIEW</button>
           </div>
-          <button onClick={resetCamera} style={{ fontSize: '10px', padding: '4px 8px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', cursor: 'pointer' }}>RESET VIEW</button>
+          {renderControls()}
         </div>
+      ) : (
+        /* --- NEW DEDICATED MOBILE SECTION --- */
+        <>
+          {!mobilePanelOpen && (
+            <button className="mobile-open-btn" onClick={() => setMobilePanelOpen(true)}>
+              ⚙️ Adjust Pulsar Physics
+            </button>
+          )}
 
-        <select value={activeProfile} onChange={handleProfileChange}>
-          {OBSERVED_PULSARS.map(star => (
-            <option key={star.id} value={star.id}>{star.name}</option>
-          ))}
-        </select>
-
-        <div className="astro-row">
-          <div className="astro-row-label"><span>Mass (M_sun)</span><span className="astro-value">{massMulti.toFixed(2)}</span></div>
-          <input type="range" min="1.0" max="2.5" step="0.01" value={massMulti} onChange={handleCustomChange(setMassMulti)} />
-        </div>
-        
-        <div className="astro-row">
-          <div className="astro-row-label"><span>Radius (km)</span><span className="astro-value">{radiusKm.toFixed(2)}</span></div>
-          <input type="range" min="8.0" max="16.0" step="0.1" value={radiusKm} onChange={handleCustomChange(setRadiusKm)} />
-        </div>
-
-        <div className="astro-row">
-          <div className="astro-row-label"><span>Spin Period (ms)</span><span className="astro-value">{spinPeriodMs.toFixed(2)}</span></div>
-          <input type="range" min="1.0" max="1000.0" step="0.1" value={spinPeriodMs} onChange={handleCustomChange(setSpinPeriodMs)} />
-        </div>
-
-        <div className="astro-row">
-          <div className="astro-row-label"><span>Period Deriv (-log10 P_dot)</span><span className="astro-value">10^-{pDotExp.toFixed(1)}</span></div>
-          <input type="range" min="10.0" max="22.0" step="0.1" value={pDotExp} onChange={handleCustomChange(setPDotExp)} />
-        </div>
-
-        <div className="astro-row">
-          <div className="astro-row-label"><span>Magnetic Inclination (α)</span><span className="astro-value">{beamAngle.toFixed(1)}°</span></div>
-          <input type="range" min="0.0" max="90.0" step="1.0" value={beamAngle} onChange={handleCustomChange(setBeamAngle)} />
-        </div>
-
-        <div className="astro-info-box">
-          <strong>Pulsar Physics Framework:</strong> Models a rapid rotating neutron star losing energy via dipole braking. Calculates Spin-Down Luminosity (E_dot = 4π²I P_dot / P³), Characteristic Age (τ_c = P / 2P_dot), and inferred dipole field (B_s = 3.2×10¹⁹ √(P P_dot)). Includes accurate light-cylinder scaling (R_LC = c/Ω) mapping observational timing parameters from the NASA/ATNF catalog directly into the physical model.
-        </div>
-      </div>
+          <div className={`astro-panel-mobile ${mobilePanelOpen ? 'open' : 'closed'}`}>
+            <button className="mobile-close-btn" onClick={() => setMobilePanelOpen(false)}>✕</button>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingRight: '24px' }}>
+              <div>
+                <h3 className="astro-title">Pulsar Simulator</h3>
+                <p className="astro-sub" style={{ margin: 0 }}>Swipe: Rotate | Pinch: Zoom</p>
+              </div>
+              <button onClick={resetCamera} style={{ fontSize: '10px', padding: '6px 10px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', borderRadius: '4px' }}>RESET</button>
+            </div>
+            
+            {renderControls()}
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -19,43 +19,72 @@ input[type=range], button { cursor: pointer; }
 .astro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
 .astro-canvas:active { cursor: grabbing; }
 
+/* Desktop Panel Base */
 .astro-panel {
   position: absolute; right: 12px; bottom: 12px; width: min(420px, calc(100% - 24px)); max-height: calc(100% - 70px);
   overflow-y: auto; padding: 16px 20px; font-size: 12.5px; line-height: 1.5; background: var(--panel);
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--line);
-  border-radius: 8px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); transition: background-color 0.5s ease, border-color 0.5s ease;
-  scrollbar-width: thin; scrollbar-color: var(--primary-soft) transparent;
+  border-radius: 8px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  scrollbar-width: thin; scrollbar-color: var(--primary-soft) transparent; z-index: 20;
 }
 .astro-panel::-webkit-scrollbar { width: 6px; }
 .astro-panel::-webkit-scrollbar-track { background: transparent; }
 .astro-panel::-webkit-scrollbar-thumb { background-color: var(--primary-soft); border-radius: 4px; }
 
-.astro-title { margin: 0 0 2px; font-size: 16px; font-weight: 700; letter-spacing: 0.02em; }
+/* Mobile Panel Overrides */
+@media (max-width: 768px) {
+  .astro-panel {
+    right: 0; bottom: 0; width: 100%; max-height: 65vh; padding: 24px 20px;
+    border-radius: 20px 20px 0 0; border-left: none; border-right: none; border-bottom: none;
+    transform: translateY(100%);
+  }
+  .astro-panel.mobile-open {
+    transform: translateY(0);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+  }
+}
+
+.astro-title { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: 0.02em; }
 .astro-sub { margin: 0 0 16px; font-size: 11.5px; color: var(--ink-muted); }
-.astro-row { margin-bottom: 12px; }
-.astro-row-label { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold; color: var(--ink); }
+.astro-row { margin-bottom: 16px; }
+.astro-row-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; color: var(--ink); }
 .astro-value { color: var(--primary); font-variant-numeric: tabular-nums; transition: color 0.5s ease; }
-.astro-info-box { margin-top: 16px; padding: 10px 12px; background: var(--primary-soft); border-left: 3px solid var(--primary); color: var(--ink); font-size: 11px; line-height: 1.4; border-radius: 0 4px 4px 0; }
-.astro-toggle { position: absolute; top: 14px; right: 14px; padding: 8px 14px; font: inherit; font-size: 12px; font-weight: bold; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; transition: all 0.2s ease; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+.astro-info-box { margin-top: 20px; padding: 12px; background: var(--primary-soft); border-left: 3px solid var(--primary); color: var(--ink); font-size: 11px; line-height: 1.4; border-radius: 0 4px 4px 0; }
+
+.astro-toggle { position: absolute; top: 14px; right: 14px; padding: 8px 14px; font: inherit; font-size: 12px; font-weight: bold; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; transition: all 0.2s ease; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); z-index: 10; }
 .astro-toggle:hover { border-color: var(--primary); color: var(--primary); }
 
-input[type='range'] { width: 100%; -webkit-appearance: none; appearance: none; height: 16px; background: transparent; }
-input[type='range']::-webkit-slider-runnable-track { height: 3px; background: var(--line); border-radius: 2px; }
-input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; margin-top: -5.5px; border-radius: 50%; background: var(--primary); border: 0; box-shadow: 0 0 10px var(--primary); transition: transform 0.1s ease; }
+/* Mobile Settings Pill */
+.mobile-settings-btn { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); background: rgba(20,22,24,0.9); border: 1px solid var(--line); color: var(--ink); padding: 10px 24px; border-radius: 24px; font-family: inherit; font-size: 13px; font-weight: bold; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 15; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); display: flex; align-items: center; gap: 8px; transition: opacity 0.3s ease; }
+.mobile-settings-btn.hidden { opacity: 0; pointer-events: none; }
+
+/* Sliders */
+input[type='range'] { width: 100%; -webkit-appearance: none; appearance: none; height: 24px; background: transparent; }
+input[type='range']::-webkit-slider-runnable-track { height: 4px; background: var(--line); border-radius: 2px; }
+input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 50%; background: var(--primary); border: 0; box-shadow: 0 0 12px var(--primary); transition: transform 0.1s ease; }
 input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
 `;
+
+// ==========================================================
+// RESPOSNIVE HOOK
+// ==========================================================
+const useWindowSize = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize(); // Init
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return isMobile;
+};
 
 // ==========================================================
 // PHYSICS ENGINE (Kerr Math applied to Time-Reversal)
 // ==========================================================
 export const CONSTANTS = {
-  G: 6.67430e-11,
-  c: 299792458,
-  h: 6.62607015e-34,
-  hbar: 1.054571817e-34,
-  k_B: 1.380649e-23,
-  M_sun: 1.98847e30,
-  sigma_SB: 5.670374419e-8
+  G: 6.67430e-11, c: 299792458, h: 6.62607015e-34, hbar: 1.054571817e-34, 
+  k_B: 1.380649e-23, M_sun: 1.98847e30, sigma_SB: 5.670374419e-8
 };
 
 export class CorePhysics {
@@ -73,7 +102,6 @@ export class RotatingBlackHole {
   static getAStar(J, mass) { return (CONSTANTS.c * J) / (CONSTANTS.G * mass**2); }
   static getSigma(r, a, theta) { return r**2 + a**2 * Math.pow(Math.cos(theta), 2); }
   static getDelta(r, M_geo, a) { return r**2 - 2 * M_geo * r + a**2; }
-  
   static getOuterHorizon(M_geo, a) { return M_geo + Math.sqrt(Math.max(0, M_geo**2 - a**2)); }
   static getInnerHorizon(M_geo, a) { return M_geo - Math.sqrt(Math.max(0, M_geo**2 - a**2)); }
   static getOuterErgosphere(M_geo, a, theta) { return M_geo + Math.sqrt(Math.max(0, M_geo**2 - a**2 * Math.pow(Math.cos(theta), 2))); }
@@ -84,16 +112,9 @@ export class RotatingBlackHole {
     const Z2 = Math.sqrt(3 * a_star**2 + Z1**2);
     return M_geo * (3 + Z2 - sign * Math.sqrt((3 - Z1) * (3 + Z1 + 2 * Z2)));
   }
-
   static getPhotonOrbit(M_geo, a_star, prograde = true) {
     const sign = prograde ? -1 : 1;
     return 2 * M_geo * (1 + Math.cos((2/3) * Math.acos(sign * a_star)));
-  }
-
-  static getKerrSurfaceGravity(M_geo, a) {
-    const r_plus = this.getOuterHorizon(M_geo, a);
-    const r_minus = this.getInnerHorizon(M_geo, a);
-    return ((r_plus - r_minus) / (2 * (r_plus**2 + a**2))) * CONSTANTS.c**2; 
   }
 }
 
@@ -106,7 +127,6 @@ void main(){ vUv = p * 0.5 + 0.5; gl_Position = vec4(p, 0.0, 1.0); }`;
 
 const FRAGMENT_SRC = `#version 300 es
 precision highp float;
-
 uniform vec2  uRes;
 uniform float uTime;
 uniform float uSpin;
@@ -116,11 +136,9 @@ uniform float uInc;
 uniform float uAzi;
 uniform float uDiskIn;
 uniform float uDiskOut;
-
 uniform float uEmission;
 uniform float uOutflow;
 uniform float uJet;
-
 out vec4 fragColor;
 
 const int MAX_STEPS = 300; 
@@ -153,19 +171,16 @@ float getKinematicRedshift(float r, float a, float L) {
 
 float hash(vec3 p3) { p3 = fract(p3*.1031); p3+=dot(p3, p3.zyx+31.32); return fract((p3.x+p3.y)*p3.z); }
 
-// Warm Neutral / White-Hot Palette
 vec3 getWhiteHoleDiskColor(float temp) {
-    vec3 c0 = vec3(0.015, 0.015, 0.020); // Deep background blend
-    vec3 c1 = vec3(0.400, 0.380, 0.360); // Warm neutral dark
-    vec3 c2 = vec3(0.700, 0.680, 0.650); // Warm bright neutral
-    vec3 c3 = vec3(0.920, 0.900, 0.880); // Soft white-hot
-    vec3 c4 = vec3(1.000, 0.970, 0.920); // Peak white with warm tint
-    vec3 c5 = vec3(1.000, 1.000, 1.000); // Pure white core
-    
+    vec3 c0 = vec3(0.015, 0.015, 0.020);
+    vec3 c1 = vec3(0.400, 0.380, 0.360);
+    vec3 c2 = vec3(0.700, 0.680, 0.650);
+    vec3 c3 = vec3(0.920, 0.900, 0.880);
+    vec3 c4 = vec3(1.000, 0.970, 0.920);
+    vec3 c5 = vec3(1.000, 1.000, 1.000);
     float t = clamp(temp, 0.0, 1.0) * 5.0;
     int i = int(floor(t));
     float f = smoothstep(0.0, 1.0, fract(t));
-    
     if (i == 0) return mix(c0, c1, f);
     if (i == 1) return mix(c1, c2, f);
     if (i == 2) return mix(c2, c3, f);
@@ -175,7 +190,6 @@ vec3 getWhiteHoleDiskColor(float temp) {
 
 void main() {
     vec2 uv = (gl_FragCoord.xy - 0.5*uRes)/min(uRes.x, uRes.y);
-    
     vec3 totalCol = vec3(0.0);
     float a = uSpin, a2 = a*a;
     float s0 = sin(uInc), c0 = cos(uInc);
@@ -183,7 +197,6 @@ void main() {
     
     float xi = -alpha * s0;
     float eta = beta * beta + c0 * c0 * (alpha * alpha - a2);
-    
     float L = xi, Q = eta;
     float K = (L - a)*(L - a) + Q;
     float C1 = a2 - L*L - Q, C2 = a2 - a*L;
@@ -209,68 +222,57 @@ void main() {
         
         float r_current = Y.x;
         
-        // Volumetric Soft Halo: Continuous illumination wrapping the structure
+        // Volumetric Soft Halo
         if (r_current >= uDiskIn && r_current < uDiskOut * 1.5) {
             float h = abs(Y.y * r_current); 
             float haloFade = exp(-h * 1.8) * exp(-(r_current - uDiskIn) * 0.15);
             if (haloFade > 0.01) {
-                vec3 haloColor = vec3(0.85, 0.82, 0.80); // Warm soft glow
+                vec3 haloColor = vec3(0.85, 0.82, 0.80);
                 float dtau_halo = haloFade * 0.015 * d_lam * uEmission;
                 totalCol += T_trans * haloColor * dtau_halo * 2.0;
                 T_trans *= exp(-dtau_halo);
             }
         }
 
-        // Volumetric Narrow Jets (Outward flow along poles)
+        // Volumetric Narrow Jets
         float jet_rho = r_current * sqrt(max(0.0, 1.0 - Y.y*Y.y));
         float jet_z = r_current * abs(Y.y);
         if (uJet > 0.0 && jet_rho < 3.0 && jet_z > rHorizon) {
             float jetDens = exp(-jet_rho * 2.5) * pow(max(rHorizon / jet_z, 0.01), 1.8) * uJet;
-            
             float jet_flow = fract(jet_z * 0.2 - uTime * uOutflow);
             jetDens *= (0.7 + 0.3 * sin(jet_flow * 6.2831));
-            
             float dtau_jet = jetDens * d_lam * 0.3;
-            vec3 jetCol = vec3(0.9, 0.92, 0.95); // White-hot jet with slight cool tint
+            vec3 jetCol = vec3(0.9, 0.92, 0.95);
             totalCol += T_trans * jetCol * dtau_jet * uEmission * 1.5;
             T_trans *= exp(-dtau_jet);
         }
 
-        // Fluid outward flowing disk/ring for White Hole
+        // Fluid outward flowing disk
         if (uDiskOut > 0.0 && (Y.y * Y_next.y <= 0.0)) {
             float t_cross = abs(Y.y) / (abs(Y.y) + abs(Y_next.y) + 1e-8);
             float r_cross = mix(Y.x, Y_next.x, t_cross);
             
             if (r_cross >= uDiskIn && r_cross < uDiskOut) {
                 float safeR = max(r_cross, rHorizon + 0.01);
-                
                 float g = getKinematicRedshift(safeR, a, L);
-                
-                // Keep the whole disk illuminated - minimum lighting floor
                 float doppler = pow(max(g, 0.0), 3.0);
                 float lighting = mix(0.65, 1.0, clamp(doppler, 0.0, 1.0));
                 
                 float ph_cross = ph + dPhi(r_cross, 0.0, a, L, C2, a2) * d_lam * t_cross;
-                
                 float rad_flow = -uTime * uOutflow; 
                 float phi_pattern = ph_cross - uTime * (uOutflow * 0.5) / (pow(r_cross, 1.5) + a); 
-                
                 float cloud = 0.7 + 0.3 * sin(r_cross * 2.0 + rad_flow + sin(phi_pattern * 2.0));
                 
                 float r_ratio = clamp((r_cross - uDiskIn) / (uDiskOut - uDiskIn), 0.0, 1.0);
-                
                 float innerFade = smoothstep(0.0, 0.08, r_ratio);
                 float outerFade = smoothstep(1.0, 0.4, r_ratio);
                 
                 float effectiveTemp = (1.0 - pow(r_ratio, 0.6)) * uEmission; 
-                effectiveTemp += (g - 1.0) * 0.2; // Blueshift heating
-                
+                effectiveTemp += (g - 1.0) * 0.2; 
                 float ringBoost = smoothstep(uDiskIn + 0.5, uDiskIn, r_cross) * 1.5; 
                 effectiveTemp = clamp(effectiveTemp + ringBoost, 0.0, 1.0);
                 
                 vec3 bbCol = getWhiteHoleDiskColor(effectiveTemp);
-                
-                // Add secondary scattered light for volumetric depth
                 vec3 scattered = bbCol * 0.12;
                 vec3 finalDiskCol = (bbCol * lighting + scattered) * 3.0 * uEmission;
                 
@@ -289,25 +291,20 @@ void main() {
         Y = Y_next;
         ph += dPhi(Y.x, Y.y, a, L, C2, a2) * d_lam;
 
-        // Dark central causal region (NO pure white ball)
         if (Y.x <= rHorizon * 1.005) { hitSurface = true; break; }
         if (isnan(Y.x) || isnan(Y.y) || Y.x > uCamDist * 1.2 || T_trans < 0.01) break; 
     }
 
     if(hitSurface) {
-        // True solid black core
         totalCol += T_trans * vec3(0.0); 
         T_trans = 0.0;
     } else if (T_trans > 0.01) {
-        // Very dark space background
         vec3 spaceColor = vec3(0.003, 0.006, 0.010);
         totalCol += T_trans * spaceColor;
-        
         float sin_th = sqrt(max(1.0 - Y.y*Y.y, 0.0));
         vec3 d = vec3(sin_th*cos(ph), Y.y, sin_th*sin(ph));
         vec3 p3 = d * 300.0;
         float starHash = hash(floor(p3));
-        
         if (starHash > 0.995) {
             float dist = length(fract(p3) - 0.5);
             if (dist < 0.35) {
@@ -317,7 +314,6 @@ void main() {
         }
     }
     
-    // Smooth Cinematic ACES Tone Mapping
     totalCol = (totalCol * (2.51 * totalCol + 0.03)) / (totalCol * (2.43 * totalCol + 0.59) + 0.14);
     fragColor = vec4(pow(clamp(totalCol, 0.0, 1.0), vec3(1.0/2.2)), 1.0);
 }
@@ -331,6 +327,8 @@ export default function WhiteHole() {
   const [glData, setGlData] = useState(null);
   const [hudVisible, setHudVisible] = useState(true);
   const [sysError, setSysError] = useState(null);
+  const isMobile = useWindowSize();
+  const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
   
   const [massMulti, setMassMulti] = useState(10.90); 
   const [spin, setSpin] = useState(0.99);
@@ -347,6 +345,8 @@ export default function WhiteHole() {
   const lastYRef = useRef(0);
 
   const handlePointerDown = (e) => {
+    // Don't trigger rotation if they are dragging the UI panel
+    if (e.target.tagName === 'INPUT' || e.target.closest('.astro-panel')) return;
     draggingRef.current = true;
     lastXRef.current = e.clientX || (e.touches && e.touches[0].clientX);
     lastYRef.current = e.clientY || (e.touches && e.touches[0].clientY);
@@ -387,12 +387,9 @@ export default function WhiteHole() {
       
       return {
         massKg, geoMass, fov, camDistScaled,
-        renderDiskIn,
-        horizon: rPlus / geoMass,
-        innerHorizon: rMinus / geoMass,
-        ergosphere: ergosphere / geoMass,
-        isco: rISCO / geoMass,
-        photonOrbit: rPhoton / geoMass
+        renderDiskIn, horizon: rPlus / geoMass,
+        innerHorizon: rMinus / geoMass, ergosphere: ergosphere / geoMass,
+        isco: rISCO / geoMass, photonOrbit: rPhoton / geoMass
       };
     } catch (e) {
       console.error(e);
@@ -507,6 +504,9 @@ export default function WhiteHole() {
     } catch (e) { return `HUD UI Error:\n${e.message}`; }
   };
 
+  // Close HUD slightly when mobile panel opens to save space
+  const displayHud = hudVisible && (!isMobile || !mobilePanelOpen);
+
   return (
     <div className="astro-root theme-whitehole">
       <style>{CSS_STYLES}</style>
@@ -518,21 +518,50 @@ export default function WhiteHole() {
         style={{ cursor: draggingRef.current ? 'grabbing' : 'grab' }}
       />
       
-      {hudVisible && (
-        <div style={{ position: 'absolute', top: 16, left: 16, textShadow: '0 1px 2px #000', fontSize: '11px', pointerEvents: 'none', lineHeight: 1.5, zIndex: 10, whiteSpace: 'pre', fontFamily: 'monospace', color: 'var(--primary)' }}>
+      {displayHud && (
+        <div style={{ position: 'absolute', top: 16, left: 16, textShadow: '0 1px 2px #000', fontSize: isMobile ? '10px' : '11px', pointerEvents: 'none', lineHeight: 1.5, zIndex: 10, whiteSpace: 'pre', fontFamily: 'monospace', color: 'var(--primary)' }}>
           {physics ? renderHUDText() : "Loading Physics Engine..."}
         </div>
       )}
       
-      <button className="astro-toggle" onClick={() => setHudVisible(!hudVisible)} style={{ zIndex: 10 }}>TOGGLE HUD</button>
+      {!isMobile && <button className="astro-toggle" onClick={() => setHudVisible(!hudVisible)}>TOGGLE HUD</button>}
       
-      <div className="astro-panel">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+      {isMobile && (
+        <button 
+          className={`mobile-settings-btn ${mobilePanelOpen ? 'hidden' : ''}`}
+          onClick={() => setMobilePanelOpen(true)}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Simulation Controls
+        </button>
+      )}
+
+      {/* Overlay to close mobile panel when tapping outside */}
+      {isMobile && mobilePanelOpen && (
+        <div 
+          onClick={() => setMobilePanelOpen(false)}
+          style={{ position: 'absolute', inset: 0, zIndex: 15 }}
+        />
+      )}
+
+      <div className={`astro-panel ${isMobile && mobilePanelOpen ? 'mobile-open' : ''}`}>
+        
+        {/* Mobile Swipe Handle */}
+        {isMobile && (
+          <div style={{ width: '40px', height: '4px', background: 'var(--line)', borderRadius: '2px', margin: '0 auto 16px', display: 'block' }} />
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
             <h3 className="astro-title">White Hole Simulator</h3>
-            <p className="astro-sub" style={{ margin: 0 }}>Drag: Rotate | Scroll: Zoom | DblClick: Reset</p>
+            <p className="astro-sub" style={{ margin: 0 }}>Drag: Rotate | {isMobile ? 'Pinch/DblTap' : 'Scroll/DblClick'}: Zoom/Reset</p>
           </div>
-          <button onClick={resetCamera} style={{ fontSize: '10px', padding: '4px 8px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', cursor: 'pointer' }}>RESET VIEW</button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={resetCamera} style={{ fontSize: '10px', padding: '6px 10px', background: 'transparent', border: '1px solid var(--primary)', borderRadius: '4px', color: 'var(--primary)', cursor: 'pointer' }}>RESET</button>
+            {isMobile && (
+              <button onClick={() => setMobilePanelOpen(false)} style={{ fontSize: '16px', padding: '4px 8px', background: 'transparent', border: 'none', color: 'var(--ink)', cursor: 'pointer', lineHeight: 1 }}>✕</button>
+            )}
+          </div>
         </div>
 
         <div className="astro-row">
@@ -559,8 +588,6 @@ export default function WhiteHole() {
           <div className="astro-row-label"><span>Disk / Ring Radius</span><span className="astro-value">{diskRadius.toFixed(1)}</span></div>
           <input type="range" min="5.0" max="30.0" step="0.1" value={diskRadius} onChange={e => setDiskRadius(parseFloat(e.target.value))} />
         </div>
-
-  
 
         <div className="astro-info-box">
           A purely theoretical, time-reversed mathematical solution to the Kerr metric. Features a solid black central causal region emitting light and matter outward continuously in a smooth cinematic warm white-hot gradient, wrapped in a full relativistic halo.

@@ -19,30 +19,65 @@ input[type=range], button { cursor: pointer; }
 .astro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
 .astro-canvas:active { cursor: grabbing; }
 
+/* Desktop Panel Base */
 .astro-panel {
   position: absolute; right: 12px; bottom: 12px; width: min(440px, calc(100% - 24px)); max-height: calc(100% - 70px);
   overflow-y: auto; padding: 16px 20px; font-size: 12.5px; line-height: 1.5; background: var(--panel);
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--line);
-  border-radius: 8px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); transition: background-color 0.5s ease, border-color 0.5s ease;
-  scrollbar-width: thin; scrollbar-color: var(--primary-soft) transparent;
+  border-radius: 8px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); transition: all 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  scrollbar-width: thin; scrollbar-color: var(--primary-soft) transparent; z-index: 20;
 }
 .astro-panel::-webkit-scrollbar { width: 6px; }
 .astro-panel::-webkit-scrollbar-track { background: transparent; }
 .astro-panel::-webkit-scrollbar-thumb { background-color: var(--primary-soft); border-radius: 4px; }
 
-.astro-title { margin: 0 0 2px; font-size: 16px; font-weight: 700; letter-spacing: 0.02em; }
-.astro-sub { margin: 0 0 16px; font-size: 11.5px; color: var(--ink-muted); }
-.astro-row { margin-bottom: 12px; }
-.astro-row-label { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold; color: var(--ink); }
-.astro-value { color: var(--primary); font-variant-numeric: tabular-nums; transition: color 0.5s ease; }
-.astro-info-box { margin-top: 16px; padding: 10px 12px; background: var(--primary-soft); border-left: 3px solid var(--primary); color: var(--ink); font-size: 11px; line-height: 1.4; border-radius: 0 4px 4px 0; }
-.astro-toggle { position: absolute; top: 14px; right: 14px; padding: 8px 14px; font: inherit; font-size: 12px; font-weight: bold; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; transition: all 0.2s ease; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+/* Mobile Panel Overrides */
+@media (max-width: 768px) {
+  .astro-panel {
+    right: 0; bottom: 0; width: 100%; max-height: 65vh; padding: 24px 20px;
+    border-radius: 20px 20px 0 0; border-left: none; border-right: none; border-bottom: none;
+    transform: translateY(100%);
+  }
+  .astro-panel.mobile-open {
+    transform: translateY(0);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+  }
+}
 
-input[type='range'] { width: 100%; -webkit-appearance: none; appearance: none; height: 16px; background: transparent; }
-input[type='range']::-webkit-slider-runnable-track { height: 3px; background: var(--line); border-radius: 2px; }
-input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; margin-top: -5.5px; border-radius: 50%; background: var(--primary); border: 0; box-shadow: 0 0 10px var(--primary); transition: transform 0.1s ease; }
+.astro-title { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: 0.02em; }
+.astro-sub { margin: 0 0 16px; font-size: 11.5px; color: var(--ink-muted); }
+.astro-row { margin-bottom: 16px; }
+.astro-row-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold; color: var(--ink); }
+.astro-value { color: var(--primary); font-variant-numeric: tabular-nums; transition: color 0.5s ease; }
+.astro-info-box { margin-top: 20px; padding: 12px; background: var(--primary-soft); border-left: 3px solid var(--primary); color: var(--ink); font-size: 11px; line-height: 1.4; border-radius: 0 4px 4px 0; }
+
+.astro-toggle { position: absolute; top: 14px; right: 14px; padding: 8px 14px; font: inherit; font-size: 12px; font-weight: bold; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; transition: all 0.2s ease; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); z-index: 10; }
+.astro-toggle:hover { border-color: var(--primary); color: var(--primary); }
+
+/* Mobile Settings Pill */
+.mobile-settings-btn { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); background: rgba(20,22,24,0.9); border: 1px solid var(--line); color: var(--ink); padding: 10px 24px; border-radius: 24px; font-family: inherit; font-size: 13px; font-weight: bold; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 15; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); display: flex; align-items: center; gap: 8px; transition: opacity 0.3s ease; }
+.mobile-settings-btn.hidden { opacity: 0; pointer-events: none; }
+
+/* Sliders */
+input[type='range'] { width: 100%; -webkit-appearance: none; appearance: none; height: 24px; background: transparent; }
+input[type='range']::-webkit-slider-runnable-track { height: 4px; background: var(--line); border-radius: 2px; }
+input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 50%; background: var(--primary); border: 0; box-shadow: 0 0 12px var(--primary); transition: transform 0.1s ease; }
 input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
 `;
+
+// ==========================================================
+// RESPOSNIVE HOOK
+// ==========================================================
+const useWindowSize = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize(); // Init
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return isMobile;
+};
 
 // ==========================================================
 // PHYSICS ENGINE (General Relativity & TOV framework)
@@ -215,6 +250,9 @@ export default function NeutronStar() {
   const [hudVisible, setHudVisible] = useState(true);
   const [sysError, setSysError] = useState(null);
   
+  const isMobile = useWindowSize();
+  const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
+  
   // States
   const [massMulti, setMassMulti] = useState(1.40); 
   const [radiusKm, setRadiusKm] = useState(12.0); 
@@ -229,6 +267,8 @@ export default function NeutronStar() {
   const lastYRef = useRef(0);
 
   const handlePointerDown = (e) => {
+    // Guard: Prevent camera rotation if user is touching the UI panel
+    if (e.target.tagName === 'INPUT' || e.target.closest('.astro-panel')) return;
     draggingRef.current = true;
     lastXRef.current = e.clientX || (e.touches && e.touches[0].clientX);
     lastYRef.current = e.clientY || (e.touches && e.touches[0].clientY);
@@ -383,6 +423,9 @@ export default function NeutronStar() {
     } catch (e) { return `HUD UI Error:\n${e.message}`; }
   };
 
+  // Conditionally hide HUD when mobile panel is active to free space
+  const displayHud = hudVisible && (!isMobile || !mobilePanelOpen);
+
   return (
     <div className="astro-root theme-neutronstar">
       <style>{CSS_STYLES}</style>
@@ -394,21 +437,51 @@ export default function NeutronStar() {
         style={{ cursor: draggingRef.current ? 'grabbing' : 'grab' }}
       />
       
-      {hudVisible && (
-        <div style={{ position: 'absolute', top: 16, left: 16, textShadow: '0 1px 2px #000', fontSize: '11px', pointerEvents: 'none', lineHeight: 1.5, zIndex: 10, whiteSpace: 'pre', fontFamily: 'monospace', color: 'var(--primary)' }}>
+      {displayHud && (
+        <div style={{ position: 'absolute', top: 16, left: 16, textShadow: '0 1px 2px #000', fontSize: isMobile ? '10px' : '11px', pointerEvents: 'none', lineHeight: 1.5, zIndex: 10, whiteSpace: 'pre', fontFamily: 'monospace', color: 'var(--primary)' }}>
           {physics ? renderHUDText() : "Loading Physics Engine..."}
         </div>
       )}
       
-      <button className="astro-toggle" onClick={() => setHudVisible(!hudVisible)} style={{ zIndex: 10 }}>TOGGLE HUD</button>
+      {!isMobile && <button className="astro-toggle" onClick={() => setHudVisible(!hudVisible)} style={{ zIndex: 10 }}>TOGGLE HUD</button>}
       
-      <div className="astro-panel">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+      {/* Floating Settings Button for Mobile */}
+      {isMobile && (
+        <button 
+          className={`mobile-settings-btn ${mobilePanelOpen ? 'hidden' : ''}`}
+          onClick={() => setMobilePanelOpen(true)}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          Configure Star
+        </button>
+      )}
+
+      {/* Overlay to dismiss mobile panel */}
+      {isMobile && mobilePanelOpen && (
+        <div 
+          onClick={() => setMobilePanelOpen(false)}
+          style={{ position: 'absolute', inset: 0, zIndex: 15 }}
+        />
+      )}
+
+      <div className={`astro-panel ${isMobile && mobilePanelOpen ? 'mobile-open' : ''}`}>
+        
+        {/* Mobile Swipe Handle */}
+        {isMobile && (
+          <div style={{ width: '40px', height: '4px', background: 'var(--line)', borderRadius: '2px', margin: '0 auto 16px', display: 'block' }} />
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
             <h3 className="astro-title">Neutron Star Simulator</h3>
-            <p className="astro-sub" style={{ margin: 0 }}>Drag: Rotate | Scroll: Zoom | DblClick: Reset</p>
+            <p className="astro-sub" style={{ margin: 0 }}>Drag: Rotate | {isMobile ? 'Pinch/DblTap' : 'Scroll/DblClick'}: Zoom/Reset</p>
           </div>
-          <button onClick={resetCamera} style={{ fontSize: '10px', padding: '4px 8px', background: 'transparent', border: '1px solid var(--primary)', color: 'var(--primary)', cursor: 'pointer' }}>RESET VIEW</button>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button onClick={resetCamera} style={{ fontSize: '10px', padding: '6px 10px', background: 'transparent', border: '1px solid var(--primary)', borderRadius: '4px', color: 'var(--primary)', cursor: 'pointer' }}>RESET</button>
+            {isMobile && (
+              <button onClick={() => setMobilePanelOpen(false)} style={{ fontSize: '16px', padding: '4px 8px', background: 'transparent', border: 'none', color: 'var(--ink)', cursor: 'pointer', lineHeight: 1 }}>✕</button>
+            )}
+          </div>
         </div>
 
         <div className="astro-row">

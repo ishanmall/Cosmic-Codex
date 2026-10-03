@@ -470,8 +470,18 @@ const THEORY_DATA = [
 ];
 
 // ==========================================================
-// 2. REUSABLE UI COMPONENTS
+// 2. HELPER HOOKS & UI COMPONENTS
 // ==========================================================
+const useWindowSize = () => {
+  const [size, setSize] = useState({ width: 1024, isMobile: false });
+  useEffect(() => {
+    const handleResize = () => setSize({ width: window.innerWidth, isMobile: window.innerWidth < 768 });
+    handleResize(); // Initialize on mount
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  return size;
+};
 
 const KatexRenderer = ({ tex, block = false }) => {
   const containerRef = useRef();
@@ -489,7 +499,7 @@ const KatexRenderer = ({ tex, block = false }) => {
   return <span ref={containerRef} className={block ? 'katex-block-container' : 'katex-inline-container'} />;
 };
 
-const FormulaCard = ({ formula, isSelected, onClick }) => {
+const FormulaCard = ({ formula, isSelected, onClick, isMobile }) => {
   return (
     <div 
       onClick={() => onClick(formula)}
@@ -497,7 +507,7 @@ const FormulaCard = ({ formula, isSelected, onClick }) => {
         background: isSelected ? 'rgba(34, 211, 238, 0.05)' : 'rgba(255, 255, 255, 0.02)',
         border: `1px solid ${isSelected ? 'rgba(34, 211, 238, 0.5)' : 'rgba(255, 255, 255, 0.08)'}`,
         borderRadius: '6px',
-        padding: '16px 20px',
+        padding: isMobile ? '12px 16px' : '16px 20px',
         margin: '12px 0',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
@@ -508,17 +518,11 @@ const FormulaCard = ({ formula, isSelected, onClick }) => {
         minHeight: '80px',
         boxShadow: isSelected ? '0 0 15px rgba(34, 211, 238, 0.1)' : 'none'
       }}
-      onMouseEnter={(e) => {
-        if (!isSelected) e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-      }}
-      onMouseLeave={(e) => {
-        if (!isSelected) e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-      }}
     >
       <div style={{ width: '100%', fontSize: '11px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', textAlign: 'left' }}>
         {formula.name}
       </div>
-      <div style={{ padding: '8px 0', fontSize: '1.1rem', maxWidth: '100%', overflowX: 'auto' }}>
+      <div style={{ padding: '8px 0', fontSize: isMobile ? '1rem' : '1.1rem', maxWidth: '100%', overflowX: 'auto' }}>
         <KatexRenderer tex={formula.tex} block={true} />
       </div>
     </div>
@@ -528,7 +532,6 @@ const FormulaCard = ({ formula, isSelected, onClick }) => {
 // ==========================================================
 // 3. MAIN APPLICATION VIEWS
 // ==========================================================
-
 const SimulatorView = () => {
   return (
     <div style={{ flex: 1, position: 'relative', background: '#000' }}>
@@ -546,15 +549,18 @@ const SimulatorView = () => {
         </mesh>
         <OrbitControls autoRotate autoRotateSpeed={0.5} enablePan={false} />
       </Canvas>
-      <div style={{ position: 'absolute', bottom: 20, left: 20, color: 'rgba(255,255,255,0.5)', fontFamily: 'monospace' }}>
+      <div style={{ position: 'absolute', bottom: 20, left: 20, color: 'rgba(255,255,255,0.5)', fontFamily: 'monospace', fontSize: '12px' }}>
         ENGINE: ACTIVE | RENDERING: KERR METRIC
       </div>
     </div>
   );
 };
 
-const TheoryView = ({ activeChapterId, onSelectChapter }) => {
+const TheoryView = ({ activeChapterId, onSelectChapter, isMobile, showSidebar, setShowSidebar }) => {
   const [selectedFormula, setSelectedFormula] = useState(null);
+  
+  // Close the formula inspector mobile sheet
+  const closeInspector = () => setSelectedFormula(null);
 
   useEffect(() => {
     const chapter = THEORY_DATA.find(c => c.id === activeChapterId);
@@ -564,27 +570,47 @@ const TheoryView = ({ activeChapterId, onSelectChapter }) => {
         firstFormula = section.items.find(i => i.type === 'formula');
         if (firstFormula) break;
       }
-      setSelectedFormula(firstFormula || null);
+      setSelectedFormula(isMobile ? null : (firstFormula || null));
     }
-  }, [activeChapterId]);
+  }, [activeChapterId, isMobile]);
 
   const activeChapter = THEORY_DATA.find(c => c.id === activeChapterId) || THEORY_DATA[0];
 
   return (
-    <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+    <div style={{ display: 'flex', flex: 1, overflow: 'hidden', position: 'relative' }}>
       
-      {/* LEFT: THEORY NAVIGATION SIDEBAR */}
-      <div style={{ width: '240px', background: '#0a0d14', borderRight: '1px solid #1f2937', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '20px 16px', fontSize: '11px', color: '#6b7280', fontWeight: 'bold', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-          Theory Chapters
+      {/* LEFT: THEORY NAVIGATION SIDEBAR (Drawer on Mobile) */}
+      <div style={{ 
+        width: isMobile ? '80%' : '240px',
+        maxWidth: '300px',
+        background: '#0a0d14', 
+        borderRight: '1px solid #1f2937', 
+        display: 'flex', 
+        flexDirection: 'column',
+        position: isMobile ? 'absolute' : 'relative',
+        top: 0,
+        bottom: 0,
+        left: isMobile ? (showSidebar ? 0 : '-100%') : 0,
+        zIndex: 50,
+        transition: 'left 0.3s ease',
+        boxShadow: isMobile && showSidebar ? '5px 0 25px rgba(0,0,0,0.5)' : 'none'
+      }}>
+        <div style={{ padding: '20px 16px', fontSize: '11px', color: '#6b7280', fontWeight: 'bold', letterSpacing: '1.5px', textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>Theory Chapters</span>
+          {isMobile && (
+            <button onClick={() => setShowSidebar(false)} style={{ background: 'transparent', border: 'none', color: '#9ca3af', fontSize: '16px' }}>✕</button>
+          )}
         </div>
-        <div style={{ overflowY: 'auto', flex: 1, padding: '0 8px' }}>
+        <div style={{ overflowY: 'auto', flex: 1, padding: '0 8px', paddingBottom: '20px' }}>
           {THEORY_DATA.map(chapter => (
             <div 
               key={chapter.id}
-              onClick={() => onSelectChapter(chapter.id)}
+              onClick={() => {
+                onSelectChapter(chapter.id);
+                if (isMobile) setShowSidebar(false);
+              }}
               style={{
-                padding: '10px 16px',
+                padding: '12px 16px',
                 margin: '4px 0',
                 borderRadius: '6px',
                 cursor: 'pointer',
@@ -601,11 +627,29 @@ const TheoryView = ({ activeChapterId, onSelectChapter }) => {
         </div>
       </div>
 
+      {/* MOBILE OVERLAY BACKGROUND FOR SIDEBAR */}
+      {isMobile && showSidebar && (
+        <div 
+          onClick={() => setShowSidebar(false)}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 40 }} 
+        />
+      )}
+
       {/* MIDDLE: MAIN THEORY CONTENT */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '40px 60px', background: '#05070b' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: isMobile ? '20px 16px' : '40px 60px', background: '#05070b' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: '28px', color: '#fff', margin: '0 0 8px 0', fontWeight: '400' }}>{activeChapter.title}</h1>
-          <hr style={{ border: 'none', borderBottom: '1px solid #1f2937', margin: '0 0 40px 0' }} />
+          
+          {isMobile && (
+            <button 
+              onClick={() => setShowSidebar(true)}
+              style={{ marginBottom: '20px', background: '#1f2937', color: '#e5e7eb', border: 'none', padding: '8px 16px', borderRadius: '4px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+              ☰ Chapters Menu
+            </button>
+          )}
+
+          <h1 style={{ fontSize: isMobile ? '22px' : '28px', color: '#fff', margin: '0 0 8px 0', fontWeight: '400', lineHeight: '1.3' }}>{activeChapter.title}</h1>
+          <hr style={{ border: 'none', borderBottom: '1px solid #1f2937', margin: '0 0 30px 0' }} />
 
           {activeChapter.sections.map((section, sIdx) => (
             <div key={sIdx} style={{ marginBottom: '50px' }}>
@@ -617,7 +661,7 @@ const TheoryView = ({ activeChapterId, onSelectChapter }) => {
                 if (item.type === 'text') {
                   const parts = item.content.split(/(\$.*?\$)/g);
                   return (
-                    <p key={iIdx} style={{ color: '#d1d5db', lineHeight: '1.6', fontSize: '15px', marginBottom: '12px' }}>
+                    <p key={iIdx} style={{ color: '#d1d5db', lineHeight: '1.6', fontSize: '15px', marginBottom: '16px' }}>
                       {parts.map((part, pIdx) => 
                         part.startsWith('$') && part.endsWith('$') 
                           ? <KatexRenderer key={pIdx} tex={part.slice(1, -1)} block={false} />
@@ -634,6 +678,7 @@ const TheoryView = ({ activeChapterId, onSelectChapter }) => {
                       formula={item} 
                       isSelected={selectedFormula?.name === item.name}
                       onClick={setSelectedFormula}
+                      isMobile={isMobile}
                     />
                   );
                 }
@@ -641,45 +686,77 @@ const TheoryView = ({ activeChapterId, onSelectChapter }) => {
               })}
             </div>
           ))}
-          <div style={{ height: '100px' }} /> 
+          <div style={{ height: isMobile ? '120px' : '100px' }} /> 
         </div>
       </div>
 
-      {/* RIGHT: SELECTED FORMULA INSPECTOR */}
-      <div style={{ width: '320px', background: '#0a0d14', borderLeft: '1px solid #1f2937', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '20px', borderBottom: '1px solid #1f2937', display: 'flex', alignItems: 'center' }}>
-          <span style={{ fontSize: '11px', color: '#22d3ee', fontWeight: 'bold', letterSpacing: '1px' }}>SELECTED EQUATION</span>
-        </div>
-        
-        {selectedFormula ? (
-          <div style={{ padding: '24px 20px', overflowY: 'auto' }}>
-            <h3 style={{ margin: '0 0 20px 0', color: '#fff', fontSize: '18px', fontWeight: '500' }}>{selectedFormula.name}</h3>
+      {/* RIGHT/BOTTOM: SELECTED FORMULA INSPECTOR */}
+      <div style={{ 
+        width: isMobile ? '100%' : '320px', 
+        background: '#0a0d14', 
+        borderLeft: isMobile ? 'none' : '1px solid #1f2937', 
+        borderTop: isMobile ? '1px solid #22d3ee' : 'none',
+        display: 'flex', 
+        flexDirection: 'column',
+        position: isMobile ? 'absolute' : 'relative',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: isMobile ? (selectedFormula ? '65vh' : '0') : 'auto',
+        zIndex: 60,
+        transition: 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        overflow: 'hidden',
+        boxShadow: isMobile && selectedFormula ? '0 -10px 40px rgba(0,0,0,0.8)' : 'none',
+        borderTopLeftRadius: isMobile ? '16px' : '0',
+        borderTopRightRadius: isMobile ? '16px' : '0'
+      }}>
+        {selectedFormula && (
+          <>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid #1f2937', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span style={{ fontSize: '11px', color: '#22d3ee', fontWeight: 'bold', letterSpacing: '1px' }}>SELECTED EQUATION</span>
+              {isMobile && (
+                <button onClick={closeInspector} style={{ background: 'transparent', border: 'none', color: '#9ca3af', fontSize: '20px', lineHeight: 1 }}>×</button>
+              )}
+            </div>
             
-            <div style={{ background: 'rgba(0,0,0,0.5)', padding: '20px', borderRadius: '8px', border: '1px solid #1f2937', marginBottom: '30px', overflowX: 'auto' }}>
-              <KatexRenderer tex={selectedFormula.tex} block={true} />
-            </div>
+            <div style={{ padding: '24px 20px', overflowY: 'auto', flex: 1 }}>
+              <h3 style={{ margin: '0 0 20px 0', color: '#fff', fontSize: '18px', fontWeight: '500' }}>{selectedFormula.name}</h3>
+              
+              <div style={{ background: 'rgba(0,0,0,0.5)', padding: '20px', borderRadius: '8px', border: '1px solid #1f2937', marginBottom: '30px', overflowX: 'auto' }}>
+                <KatexRenderer tex={selectedFormula.tex} block={true} />
+              </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <div style={{ fontSize: '10px', color: '#6b7280', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>TYPE</div>
-              <div style={{ fontSize: '14px', color: '#e5e7eb' }}>{selectedFormula.tag}</div>
-            </div>
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ fontSize: '10px', color: '#6b7280', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>TYPE</div>
+                <div style={{ fontSize: '14px', color: '#e5e7eb' }}>{selectedFormula.tag}</div>
+              </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <div style={{ fontSize: '10px', color: '#6b7280', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>APPLIES TO</div>
-              <div style={{ fontSize: '14px', color: '#e5e7eb' }}>{selectedFormula.appliesTo}</div>
-            </div>
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ fontSize: '10px', color: '#6b7280', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>APPLIES TO</div>
+                <div style={{ fontSize: '14px', color: '#e5e7eb' }}>{selectedFormula.appliesTo}</div>
+              </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <div style={{ fontSize: '10px', color: '#6b7280', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>ASSUMPTIONS</div>
-              <div style={{ fontSize: '14px', color: '#e5e7eb', lineHeight: '1.5' }}>{selectedFormula.assumptions}</div>
+              <div style={{ marginBottom: '20px' }}>
+                <div style={{ fontSize: '10px', color: '#6b7280', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px' }}>ASSUMPTIONS</div>
+                <div style={{ fontSize: '14px', color: '#e5e7eb', lineHeight: '1.5' }}>{selectedFormula.assumptions}</div>
+              </div>
             </div>
-          </div>
-        ) : (
+          </>
+        )}
+        {!selectedFormula && !isMobile && (
           <div style={{ padding: '40px 20px', textAlign: 'center', color: '#6b7280', fontSize: '14px' }}>
             Click an equation in the main panel to view its physical properties and assumptions.
           </div>
         )}
       </div>
+
+      {/* MOBILE OVERLAY BACKGROUND FOR INSPECTOR */}
+      {isMobile && selectedFormula && (
+        <div 
+          onClick={closeInspector}
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.4)', zIndex: 55 }} 
+        />
+      )}
     </div>
   );
 };
@@ -691,6 +768,8 @@ export default function AstrophysicsEngine() {
   const [appMode, setAppMode] = useState('THEORY');
   const [activeChapterId, setActiveChapterId] = useState('classical');
   const [katexLoaded, setKatexLoaded] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const { isMobile } = useWindowSize();
 
   useEffect(() => {
     if (document.getElementById('katex-stylesheet')) {
@@ -716,10 +795,16 @@ export default function AstrophysicsEngine() {
       body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; background: #05070b; color: #e5e7eb; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; overflow: hidden; }
       .katex-block-container { display: flex; justify-content: center; width: 100%; overflow-x: auto; overflow-y: hidden; }
       .katex-inline-container { display: inline-block; }
-      ::-webkit-scrollbar { width: 6px; height: 6px; }
+      
+      /* Webkit Scrollbar overrides */
+      ::-webkit-scrollbar { width: 4px; height: 4px; }
       ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+      ::-webkit-scrollbar-thumb { background: #374151; border-radius: 2px; }
       ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
+      
+      /* Hide scrollbar completely on mobile for horizontal scrolling menus */
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     `;
     document.head.appendChild(style);
   }, []);
@@ -732,11 +817,23 @@ export default function AstrophysicsEngine() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: '#05070b' }}>
       
       {/* TOP APPLICATION HEADER */}
-      <div style={{ height: '56px', background: '#0a0d14', borderBottom: '1px solid #1f2937', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', zIndex: 100 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+      <div style={{ 
+        height: 'auto', minHeight: '56px', 
+        background: '#0a0d14', 
+        borderBottom: '1px solid #1f2937', 
+        display: 'flex', 
+        flexDirection: isMobile ? 'column' : 'row',
+        alignItems: isMobile ? 'flex-start' : 'center', 
+        justifyContent: 'space-between', 
+        padding: isMobile ? '12px 16px' : '0 24px', 
+        gap: isMobile ? '12px' : '0',
+        zIndex: 100 
+      }}>
+        
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: isMobile ? '100%' : 'auto', gap: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: '#22d3ee', boxShadow: '0 0 10px #22d3ee' }}></div>
-            <span style={{ fontFamily: 'monospace', fontSize: '16px', fontWeight: 'bold', color: '#fff', letterSpacing: '1px' }}>ASTROPHYSICS ENGINE</span>
+            <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#22d3ee', boxShadow: '0 0 10px #22d3ee' }}></div>
+            <span style={{ fontFamily: 'monospace', fontSize: isMobile ? '14px' : '16px', fontWeight: 'bold', color: '#fff', letterSpacing: '1px' }}>ASTROPHYSICS ENGINE</span>
           </div>
           
           <div style={{ display: 'flex', background: '#111827', borderRadius: '6px', padding: '4px', border: '1px solid #1f2937' }}>
@@ -745,7 +842,7 @@ export default function AstrophysicsEngine() {
               style={{
                 background: appMode === 'SIMULATOR' ? '#374151' : 'transparent',
                 color: appMode === 'SIMULATOR' ? '#fff' : '#9ca3af',
-                border: 'none', padding: '6px 16px', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'
+                border: 'none', padding: '6px 12px', borderRadius: '4px', fontSize: '11px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'
               }}
             >
               SIMULATOR
@@ -755,7 +852,7 @@ export default function AstrophysicsEngine() {
               style={{
                 background: appMode === 'THEORY' ? '#374151' : 'transparent',
                 color: appMode === 'THEORY' ? '#fff' : '#9ca3af',
-                border: 'none', padding: '6px 16px', borderRadius: '4px', fontSize: '12px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'
+                border: 'none', padding: '6px 12px', borderRadius: '4px', fontSize: '11px', fontWeight: '600', cursor: 'pointer', transition: 'all 0.2s'
               }}
             >
               THEORY
@@ -764,9 +861,9 @@ export default function AstrophysicsEngine() {
         </div>
 
         {appMode === 'SIMULATOR' && (
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className="no-scrollbar" style={{ display: 'flex', gap: '8px', overflowX: 'auto', width: isMobile ? '100%' : 'auto', paddingBottom: isMobile ? '4px' : '0' }}>
             {['BLACK HOLE', 'NEUTRON STAR', 'WHITE DWARF', 'QUASAR'].map(obj => (
-              <button key={obj} style={{ background: 'transparent', border: '1px solid #374151', color: '#d1d5db', padding: '4px 12px', borderRadius: '4px', fontSize: '11px', cursor: 'pointer' }}>
+              <button key={obj} style={{ whiteSpace: 'nowrap', background: 'transparent', border: '1px solid #374151', color: '#d1d5db', padding: '4px 12px', borderRadius: '4px', fontSize: '11px', cursor: 'pointer' }}>
                 {obj}
               </button>
             ))}
@@ -780,7 +877,10 @@ export default function AstrophysicsEngine() {
       ) : (
         <TheoryView 
           activeChapterId={activeChapterId} 
-          onSelectChapter={setActiveChapterId} 
+          onSelectChapter={setActiveChapterId}
+          isMobile={isMobile}
+          showSidebar={showSidebar}
+          setShowSidebar={setShowSidebar}
         />
       )}
       
