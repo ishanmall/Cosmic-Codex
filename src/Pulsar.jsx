@@ -1,22 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 // ==========================================================
-// ASTROPHYSICAL DATA
-// ==========================================================
-const OBSERVED_PULSARS = [
-  { id: "crab", name: "Crab Pulsar (B0531+21)", mass: 1.4, radius: 10.0, pMs: 33.5, pDotExp: 12.4 },
-  { id: "vela", name: "Vela Pulsar (B0833-45)", mass: 1.4, radius: 12.0, pMs: 89.3, pDotExp: 12.9 },
-  { id: "j1748", name: "PSR J1748-2446ad (Fastest)", mass: 1.8, radius: 11.5, pMs: 1.39, pDotExp: 19.5 },
-  { id: "custom", name: "Custom Configuration", mass: 1.5, radius: 12.0, pMs: 50.0, pDotExp: 15.0 }
-];
-
-// ==========================================================
 // STYLES & THEMES
 // ==========================================================
 const CSS_STYLES = `
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body, #root { width: 100vw; height: 100vh; overflow: hidden; background-color: #000; font-family: 'Courier New', Courier, monospace; color: white; }
-input[type=range], select, button { cursor: pointer; }
+input[type=range], button { cursor: pointer; }
 
 :root {
   --primary: #00ffff; --primary-soft: rgba(0, 255, 255, 0.35); --ink: #e6ffff; --ink-muted: #66cccc;
@@ -76,13 +66,6 @@ input[type='range'] { width: 100%; -webkit-appearance: none; appearance: none; h
 input[type='range']::-webkit-slider-runnable-track { height: 3px; background: var(--line); border-radius: 2px; }
 input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; margin-top: -5.5px; border-radius: 50%; background: var(--primary); border: 0; box-shadow: 0 0 10px var(--primary); transition: transform 0.1s ease; }
 input[type='range']::-webkit-slider-thumb:hover { transform: scale(1.2); }
-
-select {
-  width: 100%; padding: 6px; background: rgba(0,0,0,0.5); color: var(--ink);
-  border: 1px solid var(--line); border-radius: 4px; margin-bottom: 16px;
-  font-family: inherit; font-size: 12px;
-}
-select option { background: #000; }
 
 /* Responsive adjustments for mobile HUD */
 @media (max-width: 768px) {
@@ -281,12 +264,11 @@ export default function Pulsar() {
   const [isMobile, setIsMobile] = useState(false);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
 
-  // States
-  const [activeProfile, setActiveProfile] = useState(OBSERVED_PULSARS[0].id);
-  const [massMulti, setMassMulti] = useState(OBSERVED_PULSARS[0].mass); 
-  const [radiusKm, setRadiusKm] = useState(OBSERVED_PULSARS[0].radius); 
-  const [spinPeriodMs, setSpinPeriodMs] = useState(OBSERVED_PULSARS[0].pMs); 
-  const [pDotExp, setPDotExp] = useState(OBSERVED_PULSARS[0].pDotExp); 
+  // States (Defaults to Crab Pulsar-like values)
+  const [massMulti, setMassMulti] = useState(1.4); 
+  const [radiusKm, setRadiusKm] = useState(10.0); 
+  const [spinPeriodMs, setSpinPeriodMs] = useState(33.5); 
+  const [pDotExp, setPDotExp] = useState(12.4); 
   const [beamAngle, setBeamAngle] = useState(45.0); 
   
   // Camera Refs
@@ -322,24 +304,6 @@ export default function Pulsar() {
   const handlePointerUp = () => { draggingRef.current = false; };
   const handleWheel = (e) => { distRef.current = Math.max(5.0, Math.min(80.0, distRef.current + e.deltaY * 0.05)); };
   const resetCamera = () => { aziRef.current = 0.0; incRef.current = 1.25; distRef.current = 25.0; };
-
-  // Profile Selection Handler
-  const handleProfileChange = (e) => {
-    const profileId = e.target.value;
-    setActiveProfile(profileId);
-    const profile = OBSERVED_PULSARS.find(s => s.id === profileId);
-    if (profile) {
-      setMassMulti(profile.mass);
-      setRadiusKm(profile.radius);
-      setSpinPeriodMs(profile.pMs);
-      setPDotExp(profile.pDotExp);
-    }
-  };
-
-  const handleCustomChange = (setter) => (e) => {
-    setter(parseFloat(e.target.value));
-    setActiveProfile('custom');
-  };
 
   const engineStateRef = useRef({ spinPeriodMs, beamAngle, physics: null });
 
@@ -480,10 +444,8 @@ export default function Pulsar() {
     try {
       const v2 = (v) => (v !== undefined && isFinite(v)) ? v.toFixed(3) : "∞";
       const vExp = (v) => (v !== undefined && isFinite(v) && v > 0) ? v.toExponential(2) : "0";
-      const currentProfile = OBSERVED_PULSARS.find(s => s.id === activeProfile) || OBSERVED_PULSARS[0];
 
-      let text = `PULSAR PHYSICS ENGINE\n─────────────────────\n`;
-      text += `MODEL:            ${currentProfile.name}\n\n`;
+      let text = `PULSAR PHYSICS ENGINE\n─────────────────────\n\n`;
       
       text += `MASS              ${massMulti.toFixed(3)} M_sun\n`;
       text += `RADIUS            ${physics.radiusKm.toFixed(2)} km\n`;
@@ -510,39 +472,33 @@ export default function Pulsar() {
   // Shared Slider Control UI (to avoid duplication between PC/Mobile panels)
   const renderControls = () => (
     <>
-      <select value={activeProfile} onChange={handleProfileChange}>
-        {OBSERVED_PULSARS.map(star => (
-          <option key={star.id} value={star.id}>{star.name}</option>
-        ))}
-      </select>
-
       <div className="astro-row">
         <div className="astro-row-label"><span>Mass (M_sun)</span><span className="astro-value">{massMulti.toFixed(2)}</span></div>
-        <input type="range" min="1.0" max="2.5" step="0.01" value={massMulti} onChange={handleCustomChange(setMassMulti)} />
+        <input type="range" min="1.0" max="2.5" step="0.01" value={massMulti} onChange={(e) => setMassMulti(parseFloat(e.target.value))} />
       </div>
       
       <div className="astro-row">
         <div className="astro-row-label"><span>Radius (km)</span><span className="astro-value">{radiusKm.toFixed(2)}</span></div>
-        <input type="range" min="8.0" max="16.0" step="0.1" value={radiusKm} onChange={handleCustomChange(setRadiusKm)} />
+        <input type="range" min="8.0" max="16.0" step="0.1" value={radiusKm} onChange={(e) => setRadiusKm(parseFloat(e.target.value))} />
       </div>
 
       <div className="astro-row">
         <div className="astro-row-label"><span>Spin Period (ms)</span><span className="astro-value">{spinPeriodMs.toFixed(2)}</span></div>
-        <input type="range" min="1.0" max="1000.0" step="0.1" value={spinPeriodMs} onChange={handleCustomChange(setSpinPeriodMs)} />
+        <input type="range" min="1.0" max="1000.0" step="0.1" value={spinPeriodMs} onChange={(e) => setSpinPeriodMs(parseFloat(e.target.value))} />
       </div>
 
       <div className="astro-row">
         <div className="astro-row-label"><span>Period Deriv (-log10 P_dot)</span><span className="astro-value">10^-{pDotExp.toFixed(1)}</span></div>
-        <input type="range" min="10.0" max="22.0" step="0.1" value={pDotExp} onChange={handleCustomChange(setPDotExp)} />
+        <input type="range" min="10.0" max="22.0" step="0.1" value={pDotExp} onChange={(e) => setPDotExp(parseFloat(e.target.value))} />
       </div>
 
       <div className="astro-row">
         <div className="astro-row-label"><span>Magnetic Inclination (α)</span><span className="astro-value">{beamAngle.toFixed(1)}°</span></div>
-        <input type="range" min="0.0" max="90.0" step="1.0" value={beamAngle} onChange={handleCustomChange(setBeamAngle)} />
+        <input type="range" min="0.0" max="90.0" step="1.0" value={beamAngle} onChange={(e) => setBeamAngle(parseFloat(e.target.value))} />
       </div>
 
       <div className="astro-info-box">
-        <strong>Pulsar Physics Framework:</strong> Models a rapid rotating neutron star losing energy via dipole braking. Calculates Spin-Down Luminosity (E_dot = 4π²I P_dot / P³), Characteristic Age (τ_c = P / 2P_dot), and inferred dipole field (B_s = 3.2×10¹⁹ √(P P_dot)). Includes accurate light-cylinder scaling (R_LC = c/Ω) mapping observational timing parameters from the NASA/ATNF catalog directly into the physical model.
+        <strong>Pulsar Physics Framework:</strong> Models a rapid rotating neutron star losing energy via dipole braking. Calculates Spin-Down Luminosity (E_dot = 4π²I P_dot / P³), Characteristic Age (τ_c = P / 2P_dot), and inferred dipole field (B_s = 3.2×10¹⁹ √(P P_dot)). Includes accurate light-cylinder scaling (R_LC = c/Ω).
       </div>
     </>
   );
@@ -567,7 +523,7 @@ export default function Pulsar() {
       <button className="astro-toggle" onClick={() => setHudVisible(!hudVisible)} style={{ zIndex: 10 }}>TOGGLE HUD</button>
       
       {/* ========================================================== */}
-      {/* UI SWITCH: PC vs MOBILE                                      */}
+      {/* UI SWITCH: PC vs MOBILE                                    */}
       {/* ========================================================== */}
       
       {!isMobile ? (
