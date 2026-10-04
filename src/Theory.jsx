@@ -732,9 +732,121 @@ const MATH_DATA = [
       {type:"formula",name:"Median (Continuous Series)",tex:"M=L+\\left(\\frac{N/2-CF}{f}\\right)\\times h",tag:"Statistics",formula:"M=L+\\left(\\frac{N/2-CF}{f}\\right)\\times h",details:"Finds the exact 50th percentile middle value inside a grouped frequency distribution, completely immune to extreme numerical outliers."},
       {type:"formula",name:"Mode (Continuous Series)",tex:"Z=L+\\left(\\frac{f_1-f_0}{2f_1-f_0-f_2}\\right)\\times h",tag:"Statistics",formula:"Z=L+\\left(\\frac{f_1-f_0}{2f_1-f_0-f_2}\\right)\\times h",details:"Calculates the highest-density absolute peak of a grouped frequency dataset, mathematically finding the most common occurrence."}
     ]}
+  ]},
+  { id: "expansion_arithmetic_algebra", title: "6. Arithmetic, Algebra & Indices", sections: [
+    { title: "Number Systems & Basic Arithmetic", items: [
+      {type:"formula",name:"Number Sets",tex:"\\mathbb N,\\mathbb Z,\\mathbb Q,\\mathbb R,\\mathbb C",tag:"Arithmetic",formula:"\\mathbb N,\\mathbb Z,\\mathbb Q,\\mathbb R,\\mathbb C",details:"Standard mathematical sets: Naturals, Integers, Rationals, Reals, and Complex Numbers."},
+      {type:"formula",name:"Fractions",tex:"\\frac ab+\\frac cd=\\frac{ad+bc}{bd}",tag:"Arithmetic",formula:"\\frac ab+\\frac cd=\\frac{ad+bc}{bd}",details:"General rule for adding fractions by finding a common denominator."},
+      {type:"formula",name:"Percentage Change",tex:"\\%\\text{ change}=\\frac{\\text{new-old}}{\\text{old}}\\times100",tag:"Arithmetic",formula:"\\%\\text{ change}=\\frac{\\text{new-old}}{\\text{old}}\\times100",details:"Calculates the relative difference scaled to a percentage."},
+      {type:"formula",name:"Absolute Value",tex:"|x|=\\begin{cases}x,&x\\ge0\\\\-x,&x<0\\end{cases}",tag:"Arithmetic",formula:"|x|=\\begin{cases}x,&x\\ge0\\\\-x,&x<0\\end{cases}",details:"The piecewise definition of absolute magnitude."},
+      {type:"formula",name:"GCD / LCM",tex:"\\gcd(a,b)\\operatorname{lcm}(a,b)=|ab|",tag:"Arithmetic",formula:"\\gcd(a,b)\\operatorname{lcm}(a,b)=|ab|",details:"The fundamental relation connecting the greatest common divisor and least common multiple."}
+    ]},
+    { title: "Algebraic Identities & Equations", items: [
+      {type:"formula",name:"Binomial Squares",tex:"(a\\pm b)^2=a^2\\pm 2ab+b^2",tag:"Algebra",formula:"(a\\pm b)^2=a^2\\pm 2ab+b^2",details:"Expansion of perfect squares."},
+      {type:"formula",name:"Difference of Squares",tex:"a^2-b^2=(a-b)(a+b)",tag:"Algebra",formula:"a^2-b^2=(a-b)(a+b)",details:"Factorization of the difference of two squares."},
+      {type:"formula",name:"Binomial Cubes",tex:"(a+b)^3=a^3+3a^2b+3ab^2+b^3",tag:"Algebra",formula:"(a+b)^3=a^3+3a^2b+3ab^2+b^3",details:"Expansion of a cubic binomial."},
+      {type:"formula",name:"Sum/Difference of Cubes",tex:"a^3\\pm b^3=(a\\pm b)(a^2\\mp ab+b^2)",tag:"Algebra",formula:"a^3\\pm b^3=(a\\pm b)(a^2\\mp ab+b^2)",details:"Factorization of cubic sums and differences."},
+      {type:"formula",name:"Quadratic Discriminant",tex:"D=b^2-4ac",tag:"Algebra",formula:"D=b^2-4ac",details:"Evaluates the nature (real/complex, distinct/repeated) of quadratic roots."},
+      {type:"formula",name:"Vieta's Formulas",tex:"x_1+x_2=-\\frac ba, \\quad x_1x_2=\\frac ca",tag:"Algebra",formula:"x_1+x_2=-\\frac ba, \\quad x_1x_2=\\frac ca",details:"Relations between the roots of a quadratic and its coefficients."}
+    ]},
+    { title: "Indices & Combinatorics", items: [
+      {type:"formula",name:"Index Laws",tex:"a^ma^n=a^{m+n}, \\quad \\frac{a^m}{a^n}=a^{m-n}, \\quad (a^m)^n=a^{mn}",tag:"Algebra",formula:"a^ma^n=a^{m+n}, \\quad \\frac{a^m}{a^n}=a^{m-n}, \\quad (a^m)^n=a^{mn}",details:"Rules for multiplying, dividing, and exponentiating terms with common bases."},
+      {type:"formula",name:"Negative & Fractional Powers",tex:"a^{-n}=\\frac1{a^n}, \\quad a^{1/n}=\\sqrt[n]{a}",tag:"Algebra",formula:"a^{-n}=\\frac1{a^n}, \\quad a^{1/n}=\\sqrt[n]{a}",details:"Conversions for inverse exponents and roots."},
+      {type:"formula",name:"Permutations",tex:"{}^nP_r=\\frac{n!}{(n-r)!}",tag:"Combinatorics",formula:"{}^nP_r=\\frac{n!}{(n-r)!}",details:"Arrangements of r items chosen from n."},
+      {type:"formula",name:"Combinations",tex:"{}^nC_r=\\frac{n!}{r!(n-r)!}",tag:"Combinatorics",formula:"{}^nC_r=\\frac{n!}{r!(n-r)!}",details:"Selections of r items chosen from n, order irrelevant."},
+      {type:"formula",name:"Generalized Binomial Theorem",tex:"(1+x)^\\alpha=\\sum_{k=0}^{\\infty}{\\alpha\\choose k}x^k",tag:"Algebra",formula:"(1+x)^\\alpha=\\sum_{k=0}^{\\infty}{\\alpha\\choose k}x^k",details:"Infinite series expansion for non-integer powers."}
+    ]},
+    { title: "Sequences & Series Extensions", items: [
+      {type:"formula",name:"Arithmetic Progression",tex:"a_n=a+(n-1)d, \\quad S_n=\\frac n2[2a+(n-1)d]",tag:"Series",formula:"a_n=a+(n-1)d, \\quad S_n=\\frac n2[2a+(n-1)d]",details:"Formulas for the nth term and total sum of an arithmetic sequence."},
+      {type:"formula",name:"Geometric Progression",tex:"a_n=ar^{n-1}, \\quad S_n=a\\frac{1-r^n}{1-r}",tag:"Series",formula:"a_n=ar^{n-1}, \\quad S_n=a\\frac{1-r^n}{1-r}",details:"Formulas for the nth term and finite sum of a geometric sequence."},
+      {type:"formula",name:"Sum of First n Integers",tex:"\\sum_{k=1}^nk=\\frac{n(n+1)}2",tag:"Series",formula:"\\sum_{k=1}^nk=\\frac{n(n+1)}2",details:"Closed-form sum of standard linear counting numbers."},
+      {type:"formula",name:"Sum of Squares",tex:"\\sum_{k=1}^nk^2=\\frac{n(n+1)(2n+1)}6",tag:"Series",formula:"\\sum_{k=1}^nk^2=\\frac{n(n+1)(2n+1)}6",details:"Closed-form sum of integer squares."},
+      {type:"formula",name:"Sum of Cubes",tex:"\\sum_{k=1}^nk^3=\\left[\\frac{n(n+1)}2\\right]^2",tag:"Series",formula:"\\sum_{k=1}^nk^3=\\left[\\frac{n(n+1)}2\\right]^2",details:"Closed-form sum of integer cubes."}
+    ]}
+  ]},
+  { id: "expansion_geometry_trig", title: "7. Geometry, Sets & Trig Extensions", sections: [
+    { title: "Complex Numbers & Set Theory", items: [
+      {type:"formula",name:"Complex Modulus",tex:"|z|=\\sqrt{a^2+b^2}",tag:"Complex Numbers",formula:"|z|=\\sqrt{a^2+b^2}",details:"Magnitude of a complex number."},
+      {type:"formula",name:"Complex Logarithm",tex:"\\log z=\\ln|z|+i(\\arg z+2\\pi k)",tag:"Complex Numbers",formula:"\\log z=\\ln|z|+i(\\arg z+2\\pi k)",details:"The multi-valued natural logarithm in the complex plane."},
+      {type:"formula",name:"Roots of Unity",tex:"z_k=r^{1/n}e^{i(\\theta+2\\pi k)/n}",tag:"Complex Numbers",formula:"z_k=r^{1/n}e^{i(\\theta+2\\pi k)/n}",details:"Finds the distinct nth roots."},
+      {type:"formula",name:"De Morgan's Laws",tex:"(A\\cup B)^c=A^c\\cap B^c, \\quad (A\\cap B)^c=A^c\\cup B^c",tag:"Set Theory",formula:"(A\\cup B)^c=A^c\\cap B^c, \\quad (A\\cap B)^c=A^c\\cup B^c",details:"The relationship between union, intersection, and set complements."},
+      {type:"formula",name:"Inclusion-Exclusion Principle",tex:"|A\\cup B|=|A|+|B|-|A\\cap B|",tag:"Set Theory",formula:"|A\\cup B|=|A|+|B|-|A\\cap B|",details:"Calculates the cardinality of set unions."}
+    ]},
+    { title: "Advanced Trigonometry", items: [
+      {type:"formula",name:"Triple Angle (Sine & Cosine)",tex:"\\sin3x=3\\sin x-4\\sin^3x, \\quad \\cos3x=4\\cos^3x-3\\cos x",tag:"Trigonometry",formula:"\\sin3x=3\\sin x-4\\sin^3x, \\quad \\cos3x=4\\cos^3x-3\\cos x",details:"Expresses triple angles entirely in terms of single angle trigonometric functions."},
+      {type:"formula",name:"Inverse Trig Addition (Sine/Cos)",tex:"\\sin^{-1}x+\\cos^{-1}x=\\frac\\pi2",tag:"Trigonometry",formula:"\\sin^{-1}x+\\cos^{-1}x=\\frac\\pi2",details:"Complementary relationship for inverse sine and cosine."},
+      {type:"formula",name:"Inverse Trig Addition (Tan/Cot)",tex:"\\tan^{-1}x+\\cot^{-1}x=\\frac\\pi2",tag:"Trigonometry",formula:"\\tan^{-1}x+\\cot^{-1}x=\\frac\\pi2",details:"Complementary relationship for inverse tangent and cotangent."}
+    ]},
+    { title: "2D & 3D Geometry", items: [
+      {type:"formula",name:"Distance Formula (2D/3D)",tex:"d=\\sqrt{(x_2-x_1)^2+(y_2-y_1)^2+(z_2-z_1)^2}",tag:"Geometry",formula:"d=\\sqrt{(x_2-x_1)^2+(y_2-y_1)^2+(z_2-z_1)^2}",details:"Calculates Euclidean distance across two or three dimensions."},
+      {type:"formula",name:"Line Equation (Point-Slope)",tex:"y-y_1=m(x-x_1)",tag:"Geometry",formula:"y-y_1=m(x-x_1)",details:"Equation of a line given one point and the slope."},
+      {type:"formula",name:"Distance Point to Line",tex:"d=\\frac{|Ax_0+By_0+C|}{\\sqrt{A^2+B^2}}",tag:"Geometry",formula:"d=\\frac{|Ax_0+By_0+C|}{\\sqrt{A^2+B^2}}",details:"Calculates the shortest orthogonal distance from a point to a line."},
+      {type:"formula",name:"Circle Equation",tex:"(x-h)^2+(y-k)^2=r^2",tag:"Geometry",formula:"(x-h)^2+(y-k)^2=r^2",details:"Standard Cartesian equation for a circle centered at (h,k)."},
+      {type:"formula",name:"Ellipse Equation",tex:"\\frac{x^2}{a^2}+\\frac{y^2}{b^2}=1",tag:"Geometry",formula:"\\frac{x^2}{a^2}+\\frac{y^2}{b^2}=1",details:"Standard Cartesian equation for an ellipse."},
+      {type:"formula",name:"Hyperbola Equation",tex:"\\frac{x^2}{a^2}-\\frac{y^2}{b^2}=1",tag:"Geometry",formula:"\\frac{x^2}{a^2}-\\frac{y^2}{b^2}=1",details:"Standard Cartesian equation for a hyperbola."},
+      {type:"formula",name:"3D Plane Equation",tex:"ax+by+cz=d",tag:"Geometry",formula:"ax+by+cz=d",details:"Standard equation for a plane in three-dimensional space."},
+      {type:"formula",name:"Direction Cosines",tex:"l^2+m^2+n^2=1",tag:"Geometry",formula:"l^2+m^2+n^2=1",details:"Identity for the directional cosines of a 3D vector."}
+    ]}
+  ]},
+  { id: "expansion_linear_algebra_calculus", title: "8. Linear Algebra & Advanced Calculus", sections: [
+    { title: "Linear Algebra & Matrices", items: [
+      {type:"formula",name:"Matrix Multiplication",tex:"(AB)_{ij}=\\sum_kA_{ik}B_{kj}",tag:"Linear Algebra",formula:"(AB)_{ij}=\\sum_kA_{ik}B_{kj}",details:"Definition of the product of two matrices."},
+      {type:"formula",name:"Determinant 2x2",tex:"\\det A=ad-bc",tag:"Linear Algebra",formula:"\\det A=ad-bc",details:"Calculates the determinant of a 2x2 matrix."},
+      {type:"formula",name:"Matrix Inverse",tex:"A^{-1}=\\frac{\\operatorname{adj}A}{\\det A}",tag:"Linear Algebra",formula:"A^{-1}=\\frac{\\operatorname{adj}A}{\\det A}",details:"General formula for the inverse of an invertible matrix using the adjugate."},
+      {type:"formula",name:"Eigenvalue Equation",tex:"A\\mathbf v=\\lambda\\mathbf v, \\quad \\det(A-\\lambda I)=0",tag:"Linear Algebra",formula:"A\\mathbf v=\\lambda\\mathbf v, \\det(A-\\lambda I)=0",details:"Defines eigenvectors/eigenvalues and the characteristic equation."},
+      {type:"formula",name:"Gram-Schmidt Orthogonalization",tex:"u_k=v_k-\\sum_{j<k}\\operatorname{proj}_{u_j}v_k",tag:"Linear Algebra",formula:"u_k=v_k-\\sum_{j<k}\\operatorname{proj}_{u_j}v_k",details:"Algorithm to construct an orthogonal basis from an arbitrary basis."},
+      {type:"formula",name:"Vector Projection",tex:"\\operatorname{proj}_u v=\\frac{\\langle v,u\\rangle}{\\langle u,u\\rangle}u",tag:"Linear Algebra",formula:"\\operatorname{proj}_u v=\\frac{\\langle v,u\\rangle}{\\langle u,u\\rangle}u",details:"Projects vector v onto vector u."},
+      {type:"formula",name:"Rank-Nullity Theorem",tex:"\\dim V=\\operatorname{rank}(T)+\\operatorname{nullity}(T)",tag:"Linear Algebra",formula:"\\dim V=\\operatorname{rank}(T)+\\operatorname{nullity}(T)",details:"A fundamental theorem relating the dimensions of the kernel and image of a linear map."},
+      {type:"text",content:"Advanced Linear Algebra Topics: basis, dimension, span, linear independence, subspaces, quotient spaces, linear transformations, kernel, image, row reduction, LU/QR/Cholesky/SVD decompositions, diagonalization, Jordan form, matrix exponential."}
+    ]},
+    { title: "Calculus Extensions", items: [
+      {type:"formula",name:"Total Derivative",tex:"df=\\sum_i\\frac{\\partial f}{\\partial x_i}dx_i",tag:"Calculus",formula:"df=\\sum_i\\frac{\\partial f}{\\partial x_i}dx_i",details:"Represents the complete differential change in a multivariable function."},
+      {type:"formula",name:"Jacobian Matrix",tex:"J=\\det\\left[\\frac{\\partial y_i}{\\partial x_j}\\right]",tag:"Calculus",formula:"J=\\det\\left[\\frac{\\partial y_i}{\\partial x_j}\\right]",details:"The determinant of the matrix of all first-order partial derivatives, critical for multivariable integration substitutions."},
+      {type:"formula",name:"Hessian Matrix",tex:"H_{ij}=\\frac{\\partial^2f}{\\partial x_i\\partial x_j}",tag:"Calculus",formula:"H_{ij}=\\frac{\\partial^2f}{\\partial x_i\\partial x_j}",details:"The square matrix of second-order partial derivatives, used in multivariable optimization."},
+      {type:"formula",name:"Multivariable Taylor Series",tex:"f(\\mathbf x)\\approx f(\\mathbf x_0)+\\nabla f\\cdot\\Delta\\mathbf x+\\frac12\\Delta\\mathbf x^TH\\Delta\\mathbf x",tag:"Calculus",formula:"f(\\mathbf x)\\approx f(\\mathbf x_0)+\\nabla f\\cdot\\Delta\\mathbf x+\\frac12\\Delta\\mathbf x^TH\\Delta\\mathbf x",details:"Approximates a multivariable function near a point using gradients and the Hessian."},
+      {type:"formula",name:"Mean Value Theorem",tex:"f'(c)=\\frac{f(b)-f(a)}{b-a}",tag:"Calculus",formula:"f'(c)=\\frac{f(b)-f(a)}{b-a}",details:"Guarantees a point where the instantaneous rate of change matches the average rate of change."}
+    ]},
+    { title: "ODE & PDE Extensions", items: [
+      {type:"formula",name:"Separable ODE",tex:"\\frac{dy}{dx}=f(x)g(y)",tag:"Differential Equations",formula:"\\frac{dy}{dx}=f(x)g(y)",details:"First-order equations that can be solved by grouping variables on opposite sides of the equality."},
+      {type:"formula",name:"Bernoulli ODE",tex:"y'+Py=Qy^n",tag:"Differential Equations",formula:"y'+Py=Qy^n",details:"A nonlinear differential equation reducible to a linear one by substitution."},
+      {type:"formula",name:"Exact ODE",tex:"Mdx+Ndy=0 \\quad \\left(\\frac{\\partial M}{\\partial y}=\\frac{\\partial N}{\\partial x}\\right)",tag:"Differential Equations",formula:"Mdx+Ndy=0 \\quad \\left(\\frac{\\partial M}{\\partial y}=\\frac{\\partial N}{\\partial x}\\right)",details:"Condition for a differential equation to be exactly integrable as a total derivative."},
+      {type:"formula",name:"Characteristic Equation (2nd Order)",tex:"ar^2+br+c=0",tag:"Differential Equations",formula:"ar^2+br+c=0",details:"Algebraic equation determining the basis solutions for linear homogeneous ODEs with constant coefficients."}
+    ]}
+  ]},
+  { id: "expansion_abstract_applied", title: "9. Abstract Algebra, Analysis & Applied Math", sections: [
+    { title: "Abstract Algebra & Number Theory", items: [
+      {type:"formula",name:"Group Axioms",tex:"(ab)c=a(bc), \\quad ae=ea=a, \\quad aa^{-1}=a^{-1}a=e",tag:"Abstract Algebra",formula:"(ab)c=a(bc), ae=ea=a, aa^{-1}=a^{-1}a=e",details:"The fundamental requirements (associativity, identity, inverse) defining a mathematical group."},
+      {type:"formula",name:"Euler's Theorem",tex:"a^{\\phi(n)}\\equiv1\\pmod n",tag:"Number Theory",formula:"a^{\\phi(n)}\\equiv1\\pmod n",details:"Generalization of Fermat's Little Theorem using the totient function."},
+      {type:"formula",name:"Fermat's Little Theorem",tex:"a^{p-1}\\equiv1\\pmod p",tag:"Number Theory",formula:"a^{p-1}\\equiv1\\pmod p",details:"A foundational theorem in modular arithmetic for prime moduli."},
+      {type:"formula",name:"Riemann Zeta Function",tex:"\\zeta(s)=\\sum_{n=1}^{\\infty}\\frac1{n^s}",tag:"Number Theory",formula:"\\zeta(s)=\\sum_{n=1}^{\\infty}\\frac1{n^s}",details:"The central function in analytic number theory, intrinsically tied to the distribution of primes."},
+      {type:"text",content:"Advanced Topics: rings, ideals, fields, Galois theory, Diophantine equations, congruences, modules, categories, functors, natural transformations."}
+    ]},
+    { title: "Complex Analysis & Transforms", items: [
+      {type:"formula",name:"Cauchy Integral Theorem",tex:"\\oint_Cf(z)\\,dz=0",tag:"Complex Analysis",formula:"\\oint_Cf(z)\\,dz=0",details:"Proves the contour integral of a holomorphic function over a closed loop is zero."},
+      {type:"formula",name:"Cauchy Integral Formula",tex:"f(a)=\\frac1{2\\pi i}\\oint_C\\frac{f(z)}{z-a}dz",tag:"Complex Analysis",formula:"f(a)=\\frac1{2\\pi i}\\oint_C\\frac{f(z)}{z-a}dz",details:"Expresses the value of a holomorphic function strictly based on values on the boundary."},
+      {type:"formula",name:"Residue Theorem",tex:"\\oint_Cf(z)dz=2\\pi i\\sum\\operatorname{Res}(f,z_k)",tag:"Complex Analysis",formula:"\\oint_Cf(z)dz=2\\pi i\\sum\\operatorname{Res}(f,z_k)",details:"A powerful tool to evaluate complex contour integrals by summing the enclosed singularities."},
+      {type:"formula",name:"Z-Transform",tex:"X(z)=\\sum_{n=-\\infty}^{\\infty}x[n]z^{-n}",tag:"Transforms",formula:"X(z)=\\sum_{n=-\\infty}^{\\infty}x[n]z^{-n}",details:"The discrete-time equivalent of the Laplace transform, vital for digital signal processing."}
+    ]},
+    { title: "Statistics, ML & Optimization", items: [
+      {type:"formula",name:"Covariance",tex:"Cov(X,Y)=E[(X-E[X])(Y-E[Y])]",tag:"Statistics",formula:"Cov(X,Y)=E[(X-E[X])(Y-E[Y])]",details:"Measures the joint variability of two random variables."},
+      {type:"formula",name:"Correlation",tex:"\\rho=\\frac{Cov(X,Y)}{\\sigma_X\\sigma_Y}",tag:"Statistics",formula:"\\rho=\\frac{Cov(X,Y)}{\\sigma_X\\sigma_Y}",details:"Normalized covariance bounded between -1 and 1."},
+      {type:"formula",name:"Poisson Distribution",tex:"P(X=k)=\\frac{\\lambda^ke^{-\\lambda}}{k!}",tag:"Probability",formula:"P(X=k)=\\frac{\\lambda^ke^{-\\lambda}}{k!}",details:"Models the probability of a given number of events occurring in a fixed interval."},
+      {type:"formula",name:"Likelihood Function",tex:"L(\\theta|x)=\\prod_i f(x_i|\\theta)",tag:"Statistics",formula:"L(\\theta|x)=\\prod_i f(x_i|\\theta)",details:"The joint probability of the observed data, viewed as a function of the parameters."},
+      {type:"formula",name:"Linear Regression (OLS)",tex:"\\hat\\beta=(X^TX)^{-1}X^Ty",tag:"Machine Learning",formula:"\\hat\\beta=(X^TX)^{-1}X^Ty",details:"The closed-form ordinary least squares solution for linear regression."},
+      {type:"formula",name:"Logistic Function",tex:"P(y=1|x)=\\frac1{1+e^{-x^T\\beta}}",tag:"Machine Learning",formula:"P(y=1|x)=\\frac1{1+e^{-x^T\\beta}}",details:"Maps regression outputs to a (0,1) probability for binary classification."},
+      {type:"formula",name:"Gradient Descent",tex:"\\theta_{t+1}=\\theta_t-\\eta\\nabla J(\\theta_t)",tag:"Optimization",formula:"\\theta_{t+1}=\\theta_t-\\eta\\nabla J(\\theta_t)",details:"Iterative first-order optimization algorithm for finding a local minimum."},
+      {type:"formula",name:"Cross Entropy Loss",tex:"L=-\\sum_i y_i\\log\\hat y_i",tag:"Machine Learning",formula:"L=-\\sum_i y_i\\log\\hat y_i",details:"Standard loss function measuring the difference between two probability distributions."}
+    ]},
+    { title: "Applied Math: Dynamics, Finance & Info Theory", items: [
+      {type:"formula",name:"Shannon Entropy",tex:"H(X)=-\\sum_xp(x)\\log p(x)",tag:"Information Theory",formula:"H(X)=-\\sum_xp(x)\\log p(x)",details:"Measures the expected uncertainty or information content of a random variable."},
+      {type:"formula",name:"KL Divergence",tex:"D_{KL}(P||Q)=\\sum_xP(x)\\log\\frac{P(x)}{Q(x)}",tag:"Information Theory",formula:"D_{KL}(P||Q)=\\sum_xP(x)\\log\\frac{P(x)}{Q(x)}",details:"Measures how one probability distribution diverges from a second, expected probability distribution."},
+      {type:"formula",name:"Black-Scholes PDE",tex:"\\frac{\\partial V}{\\partial t}+\\frac12\\sigma^2S^2\\frac{\\partial^2V}{\\partial S^2}+rS\\frac{\\partial V}{\\partial S}-rV=0",tag:"Mathematical Finance",formula:"\\frac{\\partial V}{\\partial t}+\\frac12\\sigma^2S^2\\frac{\\partial^2V}{\\partial S^2}+rS\\frac{\\partial V}{\\partial S}-rV=0",details:"The governing partial differential equation for options pricing in quantitative finance."},
+      {type:"formula",name:"Geometric Brownian Motion",tex:"dS=\\mu Sdt+\\sigma SdW",tag:"Stochastic Processes",formula:"dS=\\mu Sdt+\\sigma SdW",details:"Stochastic differential equation modeling asset prices under continuous time."},
+      {type:"formula",name:"Logistic Map (Chaos)",tex:"x_{n+1}=rx_n(1-x_n)",tag:"Dynamical Systems",formula:"x_{n+1}=rx_n(1-x_n)",details:"A classic polynomial mapping exhibiting complex chaotic behavior from simple nonlinear equations."},
+      {type:"formula",name:"Lyapunov Exponent",tex:"\\lambda=\\lim_{t\\to\\infty}\\frac1t\\ln\\frac{|\\delta x(t)|}{|\\delta x(0)|}",tag:"Dynamical Systems",formula:"\\lambda=\\lim_{t\\to\\infty}\\frac1t\\ln\\frac{|\\delta x(t)|}{|\\delta x(0)|}",details:"Quantifies the average rate of separation of infinitesimally close trajectories, characterizing chaos."}
+    ]}
   ]}
 ];
-
 // ==========================================================
 // 3. CHEMISTRY DATA (CHEM_DATA)
 // ==========================================================
